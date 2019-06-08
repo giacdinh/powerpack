@@ -4,6 +4,7 @@
 #include <sys_msg.h>
 #include <unistd.h>
 #include <pthread.h>
+#include "common.h"
 
 void *ctrl_dog_bark_task();
 void *ctrl_worker_task();
@@ -69,7 +70,11 @@ void *ctrl_worker_task()
 		if(time_set_init == -1)
 		{
 			//try to get time from gps and set system time
-			get_gps_info(&rmc);
+			if(!get_gps_info(&rmc))
+			{
+				logging(DBG_ERROR,"%s: Error return\n", __FUNCTION__);
+				continue;
+			}
 			printf("time_utc= %s\n", rmc.gpstime);
 		}
 		logging(1, "%s: Execute repeat task from control\n", __FUNCTION__);
