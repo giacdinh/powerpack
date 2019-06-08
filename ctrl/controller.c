@@ -61,9 +61,17 @@ void *ctrl_dog_bark_task()
 
 void *ctrl_worker_task()
 {
+	static int time_set_init = -1;  
+	NMEA_RMC_T rmc;
 	logging(1,"%s: Entering ...\n", __FUNCTION__);
     while(1) 
 	{
+		if(time_set_init == -1)
+		{
+			//try to get time from gps and set system time
+			get_gps_info(&rmc);
+			printf("time_utc= %s\n", rmc.gpstime);
+		}
 		logging(1, "%s: Execute repeat task from control\n", __FUNCTION__);
 		// start cellular modem connection
 		// system("sudo hologram network connect");
