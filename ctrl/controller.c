@@ -67,16 +67,13 @@ void *ctrl_worker_task()
 	logging(1,"%s: Entering ...\n", __FUNCTION__);
     while(1) 
 	{
-		if(time_set_init == -1)
+		//try to get time from gps and set system time
+		if(!get_gps_info(&rmc))
 		{
-			//try to get time from gps and set system time
-			if(!get_gps_info(&rmc))
-			{
-				logging(DBG_ERROR,"%s: Error return\n", __FUNCTION__);
-				continue;
-			}
-			printf("time_utc= %s\n", rmc.gpstime);
+			logging(DBG_ERROR,"%s: Error return\n", __FUNCTION__);
+			continue;
 		}
+		printf("lat: %f long %f\n", rmc.rlat, rmc.rlong);
 		logging(1, "%s: Execute repeat task from control\n", __FUNCTION__);
 		// start cellular modem connection
 		// system("sudo hologram network connect");
@@ -97,7 +94,7 @@ void *ctrl_worker_task()
 		// execute script
 
 		
-        sleep(10);
+        sleep(60*60);
     }
 }
 

@@ -7,9 +7,6 @@
 #include <unistd.h>
 #include "common.h"
 
-#define GPS_SERIAL_DEV "/dev/ttyUSB0"
-//#define GPS_SERIAL_DEV "/dev/ttyAMA0"
-
 float gpsconvert(float value);
 
 int set_serial(int fd, int speed)
@@ -77,7 +74,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 			/* Pass to process to each sentence format */
 			if(temp = strstr((char *) &single_sentence, "$GPRMC"))
 			{
-				//printf("%s\n", (char *) &single_sentence);
+				printf("%s\n", (char *) &single_sentence);
 				sscanf((char *) &single_sentence,"%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%15[^,],%15[^,]",
 					rmc->gpstype, rmc->gpstime, rmc->gpswarn, rmc->gpslat, rmc->gpslatpos,
 					rmc->gpslong, rmc->gpslongpos, rmc->gpsspeed, rmc->gpscourse, rmc->gpsdate);
@@ -89,8 +86,16 @@ int get_gps_info(NMEA_RMC_T *rmc)
 					float rlat, rlong;
 					rmc->rlat = gpsconvert(declat);
 					rmc->rlong = gpsconvert(declong);
-					return 0;
-					//printf("%f, -%f\n",rmc->rlat, rmc->rlong);
+
+					if(!strncmp(rmc->gpslatpos,"S",1))
+						rmc->rlat *= -1;
+
+					if(!strncmp(rmc->gpslongpos,"W",1))
+						rmc->rlong *= -1;
+
+
+					printf("%s %s\n",rmc->gpslatpos, rmc->gpslongpos);
+					return 1;
 			}
 			
 			/* reset space for the next sentence */

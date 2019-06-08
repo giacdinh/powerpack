@@ -12,3 +12,7 @@ typedef struct {
     float rlat;
     float rlong;
 } NMEA_RMC_T;	
+
+#define GPS_SERIAL_DEV "/dev/ttyUSB0"
+//#define GPS_SERIAL_DEV "/dev/ttyAMA0"
+int get_gps_info(NMEA_RMC_T *rmc);
