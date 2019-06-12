@@ -94,7 +94,7 @@ void *ctrl_worker_task()
 		// execute script
 
 		
-        sleep(60*60);
+        sleep(60);
     }
 }
 

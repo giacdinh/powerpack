@@ -98,10 +98,17 @@ void remotem_msg_handler(REMOTEM_MSG_T *Incoming)
 
 void *remotem_dog_bark_task()
 {
+	static int tem_cnt = 0;
     while(1) 
 	{
         send_dog_bark(REMOTEM_MODULE_ID);
         sleep(1);
+		if(tem_cnt++ > 30)
+		{
+			system("sudo /opt/vc/bin/vcgencmd measure_temp >> ./tempurature");
+			system("sudo date >> ./tempurature");
+			tem_cnt = 0;
+		}
     }
 }
 
