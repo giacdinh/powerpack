@@ -7,10 +7,12 @@
 
 #define CLOUD_ACCEPT        "Accept: application/json"
 #define MAIN_URL			"http://bacson.tech"
+#define POST_DATA "uid=pp_000000001&coord=28.703239,%20-81.204086"
+
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-	printf("%s: %s\n", ptr);
+	printf("%s: %s\n", __FUNCTION__, ptr);
     return nmemb;
 }
 
@@ -35,7 +37,7 @@ int main()
     //logger_cloud("%s: Entering ... ", __FUNCTION__);
 
     //headers = curl_slist_append(headers, (char *) &Accept);
-    headers = curl_slist_append(headers, CLOUD_ACCEPT);
+    //headers = curl_slist_append(headers, CLOUD_ACCEPT);
     //headers = curl_slist_append(headers, CLOUD_AUTHORIZE);
 
     //logger_cloud("DEBUG: %s", p_data_field);
@@ -57,8 +59,8 @@ int main()
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
 
-//        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-//        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, p_data_field);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, POST_DATA);
         
         /* Now run off and do what you've been told! */ 
         res = curl_easy_perform(curl);

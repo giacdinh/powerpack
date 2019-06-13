@@ -44,13 +44,15 @@ int set_serial(int fd, int speed)
     return 0;
 }
 
-int get_gps_info(NMEA_RMC_T *rmc)
+int main()
 {
 	int fd, i;
 	char read_buf[1024];
 	int readbyte;
 	char *src,*dest;
 	char GPGGA[128];
+	NMEA_RMC_T nmea_rmc;
+
 	fd = open(GPS_SERIAL_DEV, O_RDWR);
 	if( fd < 0)
 	{
@@ -59,6 +61,8 @@ int get_gps_info(NMEA_RMC_T *rmc)
 	}
 
 	set_serial(fd, B4800);
+
+printf("set serial ok\n");
 
 	/* Init read single NMEA string */
 	char single_sentence[128], *temp;
@@ -70,32 +74,23 @@ int get_gps_info(NMEA_RMC_T *rmc)
 		read(fd,temp,1);
 		if(*temp == '\n')
 		{
-			//printf("%s", (char *) &single_sentence);	
+			printf("%s", (char *) &single_sentence);	
 			/* Pass to process to each sentence format */
 			if(temp = strstr((char *) &single_sentence, "$GPRMC"))
 			{
-				printf("%s\n", (char *) &single_sentence);
+				NMEA_RMC_T nmea_rmc;
 				sscanf((char *) &single_sentence,"%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%15[^,],%15[^,]",
-					rmc->gpstype, rmc->gpstime, rmc->gpswarn, rmc->gpslat, rmc->gpslatpos,
-					rmc->gpslong, rmc->gpslongpos, rmc->gpsspeed, rmc->gpscourse, rmc->gpsdate);
+					nmea_rmc.gpstype, nmea_rmc.gpstime, nmea_rmc.gpswarn, nmea_rmc.gpslat, nmea_rmc.gpslatpos,
+					nmea_rmc.gpslong, nmea_rmc.gpslongpos, nmea_rmc.gpsspeed, nmea_rmc.gpscourse, nmea_rmc.gpsdate);
 
 					float declat, declong;
-					declat = strtof(rmc->gpslat,NULL);
-					declong = strtof(rmc->gpslong,NULL);
+					declat = strtof(nmea_rmc.gpslat,NULL);
+					declong = strtof(nmea_rmc.gpslong,NULL);
 
 					float rlat, rlong;
-					rmc->rlat = gpsconvert(declat);
-					rmc->rlong = gpsconvert(declong);
-
-					if(!strncmp(rmc->gpslatpos,"S",1))
-						rmc->rlat *= -1;
-
-					if(!strncmp(rmc->gpslongpos,"W",1))
-						rmc->rlong *= -1;
-
-					//printf("%s %s\n",rmc->gpslatpos, rmc->gpslongpos);
-					close(fd);
-					return 1;
+					rlat = gpsconvert(declat);
+					rlong = gpsconvert(declong);
+					printf("time: %s %f, -%f\n",nmea_rmc.gpstime, rlat, rlong);
 			}
 			
 			/* reset space for the next sentence */
@@ -104,10 +99,15 @@ int get_gps_info(NMEA_RMC_T *rmc)
 			usleep(5000); // Sleep 5 mils 
 		}
 		else
+		{
 			temp++;
+			if((temp - single_sentence) > 100)
+			{	// rewind
+				temp = (char *) &single_sentence;
+				bzero(temp,128);
+			}
+		}
 	}
-	close(fd);
-	return 0;
 }
 
 float gpsconvert(float value)
