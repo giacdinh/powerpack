@@ -1,15 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <sys_msg.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <netdb.h>
 #include "common.h"
 #include "ctrl_common.h"
 
 void *ctrl_dog_bark_task();
 void *ctrl_worker_task();
 void ctrl_msg_handler(CTRL_MSG_T *Incoming);
+int coord_validate(NMEA_RMC_T *rmc);
+int ping_host();
 
 int ctrl_main_task()
 {
@@ -70,39 +74,39 @@ void *ctrl_worker_task()
     while(1) 
 	{
 		//try to get time from gps and set system time
-#ifdef NOT_RASPI
 		if(!get_gps_info(&rmc))
 		{
 			logging(DBG_ERROR,"%s: Error return\n", __FUNCTION__);
+			sleep(1);
 			continue;
 		}
-#endif
-		rmc.rlat = 28.703366;
-		rmc.rlong = -81.302941; 
+		
+		if(!coord_validate(&rmc))
+		{
+			sleep(1);
+			continue;
+		}
 
 		sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
 		logging(1, "coordinate: %s\n", (char *) &coord[0]);
 		postdata((char *) &coord[0]);
 		// start cellular modem connection
-		// system("sudo hologram network connect");
-		// sleep(2);
-		
-		// check for connectivity confirm 
-		// for(;;)
-		// {
-		//		struct hostent *hostinfo;
-		//		hostinfo = gethostbyname(BACSON_HOST_NAME);
-		//		if(hostinfo == NULL) // Not connected???
-		//			break;
-		// }
-
-		// send infor to server
-		// get_cellular_coordinate();
-		// build_data_send_script();
-		// execute script
-
-		
-        sleep(10);
+		 system("sudo hologram network connect");
+		 sleep(2);
+	
+		if(!ping_host())
+			logging(DBG_ERROR,"Can't connect to host\n");	
+		else
+		{
+			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
+			logging(1, "coordinate: %s\n", (char *) &coord[0]);
+			postdata((char *) &coord[0]);
+			
+			// disconnect modem and go back to waiting mode
+			system("sudo hologram network disconnect");	
+			sleep(2);
+		}		
+        sleep(60*60);
     }
 }
 
@@ -118,4 +122,23 @@ void ctrl_msg_handler(CTRL_MSG_T *Incoming)
             break;
     }
 }
+
+int coord_validate(NMEA_RMC_T *rmc)
+{
+	if(rmc->rlat == 0 || rmc->rlong == 0)
+		return -1;
+
+	return 1;
+}
+
+int ping_host()
+{
+	struct hostent *hostinfo;
+	hostinfo = gethostbyname(BACSON_HOST_NAME);
+	if(hostinfo == NULL) // Not connected???
+		return -1;
+
+	return 1;
+}
+
 
