@@ -14,7 +14,7 @@ subdirs:
 
 main_app: main.o
 		gcc -o main_app main.o system/system.a \
-				remotem/remotem.a ctrl/ctrl.a -lpthread
+				remotem/remotem.a ctrl/ctrl.a -lpthread -lcurl
 
 
 clean:

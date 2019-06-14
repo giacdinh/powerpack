@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include "common.h"
+#include "ctrl_common.h"
 
 void *ctrl_dog_bark_task();
 void *ctrl_worker_task();
@@ -64,17 +65,24 @@ void *ctrl_worker_task()
 {
 	static int time_set_init = -1;  
 	NMEA_RMC_T rmc;
+	char coord[128];
 	logging(1,"%s: Entering ...\n", __FUNCTION__);
     while(1) 
 	{
 		//try to get time from gps and set system time
+#ifdef NOT_RASPI
 		if(!get_gps_info(&rmc))
 		{
 			logging(DBG_ERROR,"%s: Error return\n", __FUNCTION__);
 			continue;
 		}
-		printf("lat: %f long %f\n", rmc.rlat, rmc.rlong);
-		logging(1, "%s: Execute repeat task from control\n", __FUNCTION__);
+#endif
+		rmc.rlat = 28.703366;
+		rmc.rlong = -81.302941; 
+
+		sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
+		logging(1, "coordinate: %s\n", (char *) &coord[0]);
+		postdata((char *) &coord[0]);
 		// start cellular modem connection
 		// system("sudo hologram network connect");
 		// sleep(2);
@@ -94,7 +102,7 @@ void *ctrl_worker_task()
 		// execute script
 
 		
-        sleep(60);
+        sleep(10);
     }
 }
 

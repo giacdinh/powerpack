@@ -16,3 +16,4 @@ typedef struct {
 //#define GPS_SERIAL_DEV "/dev/ttyUSB0"
 #define GPS_SERIAL_DEV "/dev/ttyACM0" //AMA0
 int get_gps_info(NMEA_RMC_T *rmc);
+int logging(int level, char *logstr, ...);
