@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/prctl.h>
 
-#define APP_VERSION "1.0.1"
+#define APP_VERSION "1.0.1.0"
 extern void wdog_main_task();
 extern void remotem_main_task();
 extern void ctrl_main_task();
@@ -31,6 +31,11 @@ int main(int argc, char **argv)
 	logging(DBG_DBG, "**********************************\n");
 	logging(DBG_DBG, "       Application %s start ...\n", APP_VERSION);
 	logging(DBG_DBG, "**********************************\n");
+	
+	// Sleep 10 second to make sure hardware is ready
+	logging(1,"Sleep 10 seconds makure sure hardware is ready\n");
+	sleep(10);
+
 	// Start watch dog for log
 	if(wdog_pid == -1)
 	{        

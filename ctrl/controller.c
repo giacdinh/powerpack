@@ -83,8 +83,8 @@ void *ctrl_worker_task()
 		
 		if(-1 == coord_validate(&rmc))
 		{
-			logging(1, "Coordinate invalid. Loop for more data\n");
-			sleep(1);
+			logging(1, "Coordinate invalid. Sleep for a minute then loop for more data\n");
+			sleep(60);
 			continue;
 		}
 

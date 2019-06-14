@@ -93,7 +93,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 					if(!strncmp(rmc->gpslongpos,"W",1))
 						rmc->rlong *= -1;
 
-					//printf("%s %s\n",rmc->gpslatpos, rmc->gpslongpos);
+					logging(1,"%s %s\n",rmc->gpslatpos, rmc->gpslongpos);
 					close(fd);
 					return 1;
 			}
