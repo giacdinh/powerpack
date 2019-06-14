@@ -26,7 +26,7 @@ int logging(int level, char *logstr, ...)
 
 	// Set up file name
 	strftime((char *) &logfiletime[0], 9, "%Y%m%d", localtime_r(&now, &ts));
-	sprintf((char *) &logfilename[0], "./%s_log", (char *) &logfiletime[0]);
+	sprintf((char *) &logfilename[0], "/mnt/sysdata/log/%s_log", (char *) &logfiletime[0]);
 
 	memset((char *) &logbuf[0], 0, 128);
 	va_list vl;
