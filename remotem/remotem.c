@@ -16,6 +16,7 @@
 #include <arpa/inet.h>
 
 #include "remotem.h"
+#include "remotem_common.h"
 #include <sys_msg.h>
 
 #define REMOTEM_LOCAL_IPADDR    "127.0.0.1"
@@ -99,6 +100,7 @@ void remotem_msg_handler(REMOTEM_MSG_T *Incoming)
 void *remotem_dog_bark_task()
 {
 	static int tem_cnt = 0;
+	static int udb_cnt = 0;
     while(1) 
 	{
         send_dog_bark(REMOTEM_MODULE_ID);
@@ -108,6 +110,12 @@ void *remotem_dog_bark_task()
 			system("sudo /opt/vc/bin/vcgencmd measure_temp >> ./tempurature");
 			system("sudo date >> ./tempurature");
 			tem_cnt = 0;
+		}
+		if(udb_cnt++ > 5)
+		{
+			printf("Broadcast UDP");
+			broadcast_id("powerpack");
+			udb_cnt = 0;
 		}
     }
 }
@@ -226,29 +234,6 @@ int remotem_request_handler(int new_remotem_sock)
 	return 0;
 }
 	
-
-//void remotem_tag_read()
-//{
-//    logging(DBG_DBG, "%s: Send tag read request\n", __FUNCTION__);
-//	send_msg_to_reader((int) MSG_TAG_READ);
-//}
-
-//void send_msg_to_reader(int msg_id)
-//{
-//	READER_MSG_T reader_msg;
-//    bzero((char *) &reader_msg, sizeof(READER_MSG_T));
-//
-//    int msgid = open_msg(READER_MSGQ_KEY);
-//    if(msgid < 0)
-//    {
-//        logging(DBG_ERROR, "Error invalid message queue\n");
-//        return;
-//    }
-
-//    reader_msg.header.subType = MSG_TAG_READ;
-//    reader_msg.header.moduleID = REMOTEM_MODULE_ID;
-//    send_msg(msgid, (void *) &reader_msg, sizeof(READER_MSG_T), 3);
-//}
 
 void request_response_header(int new_remotem_sock)
 {

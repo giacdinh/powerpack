@@ -38,7 +38,7 @@ int main(int argc, char **argv)
         if(wdog_pid == 0) // child process
         {
             logging(DBG_INFO, "Launch watchdog task ID: %i\n", getpid());
-	    prctl(PR_SET_NAME,"app_watchdog");
+			prctl(PR_SET_NAME,"main_app_wd");
             wdog_main_task();
         }
     }
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
         if(remotem_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch remotem task ID: %i\n", getpid());
-	    prctl(PR_SET_NAME,"app_remote");
+	    prctl(PR_SET_NAME,"main_app_rm");
             remotem_main_task();
         }   
     }	
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
         if(ctrl_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch controller task ID: %i\n", getpid());
-	    prctl(PR_SET_NAME,"app_controller");
+	    prctl(PR_SET_NAME,"main_app_ctrl");
             ctrl_main_task();
         }   
     }	
