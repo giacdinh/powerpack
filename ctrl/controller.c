@@ -81,20 +81,18 @@ void *ctrl_worker_task()
 			continue;
 		}
 		
-		if(!coord_validate(&rmc))
+		if(-1 == coord_validate(&rmc))
 		{
+			logging(1, "Coordinate invalid. Loop for more data\n");
 			sleep(1);
 			continue;
 		}
 
-		sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
-		logging(1, "coordinate: %s\n", (char *) &coord[0]);
-		postdata((char *) &coord[0]);
 		// start cellular modem connection
 		 system("sudo hologram network connect");
 		 sleep(2);
 	
-		if(!ping_host())
+		if(-1 == ping_host())
 			logging(DBG_ERROR,"Can't connect to host\n");	
 		else
 		{
@@ -125,9 +123,11 @@ void ctrl_msg_handler(CTRL_MSG_T *Incoming)
 
 int coord_validate(NMEA_RMC_T *rmc)
 {
-	if(rmc->rlat == 0 || rmc->rlong == 0)
+	if(rmc->rlat == 0.0 || rmc->rlong == 0.0)
+	{
+		logging(DBG_ERROR, "Invalid coordinate. lat: %f long:%f\n", rmc->rlat, rmc->rlong);
 		return -1;
-
+	}
 	return 1;
 }
 
