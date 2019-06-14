@@ -17,7 +17,8 @@ void UpdateBarkList(int Module);
 void register_modules();
 void wd_action();
 
-char *modname[] = {"REMOTEM", "CTRL"};
+//char *modname[] = {"REMOTEM", "CTRL"};
+char *modname[] = {"CTRL"};
 char *cmdname[] = {"Bark", "shutdown", "data"};
 
 unsigned long get_sys_cur_time()

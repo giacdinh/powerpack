@@ -5,7 +5,7 @@ CFLAGS=-I./inc
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-SUBDIRS = remotem system ctrl
+SUBDIRS = system ctrl #remotem
 
 subdirs:
 	for dir in $(SUBDIRS); do \
@@ -14,12 +14,12 @@ subdirs:
 
 main_app: main.o
 		gcc -o main_app main.o system/system.a \
-				remotem/remotem.a ctrl/ctrl.a -lpthread -lcurl
+				ctrl/ctrl.a -lpthread -lcurl
 
 
 clean:
 	rm *.o main_app 
 
 depclean:
-	rm main_app main.o remotem/remotem.a system/system.a \
-			ctrl/ctrl.a ctrl/*.o remotem/*.o system/*.o
+	rm main_app main.o system/system.a \
+			ctrl/ctrl.a ctrl/*.o system/*.o

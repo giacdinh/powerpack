@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/prctl.h>
 
-#define APP_VERSION "1.0.1.0"
+#define APP_VERSION "1.0.1.1"
 extern void wdog_main_task();
 extern void remotem_main_task();
 extern void ctrl_main_task();
@@ -48,7 +48,8 @@ int main(int argc, char **argv)
         }
     }
 
-	// Start remotem
+	// Start remote
+#ifdef NOTUSE
 	if(remotem_pid == -1)
     {
         remotem_pid = fork();
@@ -59,6 +60,7 @@ int main(int argc, char **argv)
             remotem_main_task();
         }   
     }	
+#endif
 
 	// Start controller 
 	if(ctrl_pid == -1)
