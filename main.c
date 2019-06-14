@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 
-
+#define APP_VERSION "1.0.1"
 extern void wdog_main_task();
 extern void remotem_main_task();
 extern void ctrl_main_task();
@@ -16,10 +16,19 @@ int main(int argc, char **argv)
 	pid_t remotem_pid = -1;
 	pid_t ctrl_pid = -1;
 
+    if(argc > 1)
+    {
+        if(!strcmp(argv[1], "-v"))
+        {
+			printf("Run version: %s\n", APP_VERSION);
+        }
+        return 0;
+    }
+
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "**********************************\n");
-	logging(DBG_DBG, "       Application start ...\n");
+	logging(DBG_DBG, "       Application %s start ...\n", APP_VERSION);
 	logging(DBG_DBG, "**********************************\n");
 	// Start watch dog for log
 	if(wdog_pid == -1)
