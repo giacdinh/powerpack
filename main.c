@@ -62,7 +62,7 @@ int main(int argc, char **argv)
         if(ctrl_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch controller task ID: %i\n", getpid());
-	    prctl(PR_SET_NAME,"controller");
+	    prctl(PR_SET_NAME,"app_controller");
             ctrl_main_task();
         }   
     }	
