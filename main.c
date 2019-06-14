@@ -3,6 +3,7 @@
 #include <sys_msg.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/prctl.h>
 
 #define APP_VERSION "1.0.1"
 extern void wdog_main_task();
@@ -37,7 +38,7 @@ int main(int argc, char **argv)
         if(wdog_pid == 0) // child process
         {
             logging(DBG_INFO, "Launch watchdog task ID: %i\n", getpid());
-            memcpy(argv[0], "main_watchdog         \n", 26);
+	    prctl(PR_SET_NAME,"app_watchdog");
             wdog_main_task();
         }
     }
@@ -49,7 +50,7 @@ int main(int argc, char **argv)
         if(remotem_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch remotem task ID: %i\n", getpid());
-            memcpy(argv[0], "remote_system          \n", 24);
+	    prctl(PR_SET_NAME,"app_remote");
             remotem_main_task();
         }   
     }	
@@ -61,7 +62,7 @@ int main(int argc, char **argv)
         if(ctrl_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch controller task ID: %i\n", getpid());
-            memcpy(argv[0], "controller_system      \n", 24);
+	    prctl(PR_SET_NAME,"controller");
             ctrl_main_task();
         }   
     }	
