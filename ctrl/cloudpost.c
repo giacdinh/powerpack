@@ -5,10 +5,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include "common.h"
+#include "ctrl_common.h"
 
 #define CLOUD_ACCEPT        "Accept: application/json"
 #define MAIN_URL			"http://bacson.tech/endpoint.php/postdata?"
-#define POST_DATA "uid=pp_000000001&coord=%s"
+#define POST_DATA "uid=%s&coord=%s"
 
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -35,10 +36,17 @@ int postdata(char *coordinate)
     CURLcode res;
     struct curl_slist *headers = NULL;
 	char datafield[128], *pdata;
+	static char uid[32], *puid = NULL;
 	
 	pdata = (char *) &datafield[0];
 
-	sprintf(pdata,POST_DATA,coordinate);
+	if(puid == NULL) // Init code, get unit Id and store
+	{
+		puid = (char *) &uid[0];
+		strncpy(puid, (char *) unit_ID(),32);
+	}
+	
+	sprintf(pdata,POST_DATA,puid,coordinate);
     //logging(1,"%s\n", pdata);
 
     /* In windows, this will init the winsock stuff */ 

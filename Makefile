@@ -14,8 +14,7 @@ subdirs:
 
 main_app: main.o
 		gcc -o main_app main.o system/system.a \
-				ctrl/ctrl.a -lpthread -lcurl
-
+				ctrl/ctrl.a -lpthread -lcurl -lssl -lcrypto
 
 clean:
 	rm *.o main_app 
