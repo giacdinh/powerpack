@@ -93,7 +93,12 @@ void *ctrl_worker_task()
 		 sleep(2);
 	
 		if(-1 == ping_host())
-			logging(DBG_ERROR,"Can't connect to host\n");	
+		{
+			logging(DBG_ERROR,"Can't connect to host. Skip this post\n");	
+			// disconnect modem and go back to waiting mode
+			system("sudo hologram network disconnect");	
+			sleep(2);
+		}
 		else
 		{
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
