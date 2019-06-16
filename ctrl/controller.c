@@ -68,6 +68,7 @@ void *ctrl_dog_bark_task()
 void *ctrl_worker_task()
 {
 	static int time_set_init = -1;  
+	static int gps_cnt = 0;
 	NMEA_RMC_T rmc;
 	char coord[128];
 	logging(1,"%s: Entering ...\n", __FUNCTION__);
@@ -76,21 +77,35 @@ void *ctrl_worker_task()
 		//try to get time from gps and set system time
 		if(!get_gps_info(&rmc))
 		{
+			if(gps_cnt++ > 5)
+			{
+				rmc.rlat = 0.000001;
+				rmc.rlat = 0.000001;
+				gps_cnt = 0;
+				logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
+				goto use_default_gps;
+			}
 			logging(DBG_ERROR,"%s: Error return\n", __FUNCTION__);
-			sleep(1);
+			sleep(5);
 			continue;
 		}
+		else
+			gps_cnt = 0;	// Reset when able to get GPS coordinate
 		
 		if(-1 == coord_validate(&rmc))
 		{
 			logging(1, "Coordinate invalid. Sleep for a minute then loop for more data\n");
-			sleep(60);
+			sleep(5);
 			continue;
 		}
 
+use_default_gps:
+		// get core temperature 
+		system("sudo /opt/vc/bin/vcgencmd measure_temp > /tmp/temperature");
+		sleep(1);
 		// start cellular modem connection
-		 system("sudo hologram network connect");
-		 sleep(2);
+		system("sudo hologram network connect");
+		sleep(2);
 	
 		if(-1 == ping_host())
 		{
@@ -109,7 +124,7 @@ void *ctrl_worker_task()
 			system("sudo hologram network disconnect");	
 			sleep(2);
 		}		
-        sleep(60*60);
+        sleep(6*60*60);
     }
 }
 
