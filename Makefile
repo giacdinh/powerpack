@@ -1,6 +1,4 @@
-
-
-all: subdirs main_app 
+all: timestamp subdirs main_app 
 CFLAGS=-I./inc
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -15,6 +13,10 @@ subdirs:
 main_app: main.o
 		gcc -o main_app main.o system/system.a \
 				ctrl/ctrl.a -lpthread -lcurl -lssl -lcrypto
+		rm build.h
+
+timestamp:
+	echo "#define BUILDTIME \" `date`\" " > build.h
 
 clean:
 	rm *.o main_app 

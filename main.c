@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/prctl.h>
+#include "build.h"
 
 #define APP_VERSION "1.0.1.2"
 extern void wdog_main_task();
@@ -21,7 +22,7 @@ int main(int argc, char **argv)
     {
         if(!strcmp(argv[1], "-v"))
         {
-			printf("Run version: %s\n", APP_VERSION);
+			printf("Run version: %s %s\n", APP_VERSION, BUILDTIME);
         }
         return 0;
     }
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "**********************************\n");
-	logging(DBG_DBG, "       Application %s start ...\n", APP_VERSION);
+	logging(DBG_DBG, "       Application %s %s start ...\n", APP_VERSION, BUILDTIME);
 	logging(DBG_DBG, "**********************************\n");
 	
 	// Sleep 10 second to make sure hardware is ready
