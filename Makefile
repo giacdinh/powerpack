@@ -16,11 +16,11 @@ main_app: main.o
 		rm build.h
 
 timestamp:
-	echo "#define BUILDTIME \" `date`\" \" commit: `git show |grep commit | cut -c 40-47`\" " > build.h
+	echo "#define BUILDTIME \"commit:"`git show |grep commit | cut -c 40-47`"\" \" `date`\" " > build.h
 
 clean:
 	rm *.o main_app 
 
 depclean:
-	rm main_app main.o system/system.a \
+	rm main_app main.o build.h system/system.a \
 			ctrl/ctrl.a ctrl/*.o system/*.o
