@@ -90,9 +90,9 @@ char *get_core_temp()
 {
 	char core_temp[16], *ret_temp;
 	FILE *fd;
-	if(access("/tmp/core_temp", 0 ) == 0)
+	if(access("/mnt/sysdata/log/core_temp", 0 ) == 0)
 	{
-		fd = fopen("/tmp/core_temp", "r");
+		fd = fopen("/mnt/sysdata/log/core_temp", "r");
 		if(fd > 0)
 		{
 			fscanf(fd, "%s",(char *) &core_temp[0]);

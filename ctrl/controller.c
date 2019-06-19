@@ -101,7 +101,7 @@ void *ctrl_worker_task()
 
 use_default_gps:
 		// get core temperature 
-		system("sudo /opt/vc/bin/vcgencmd measure_temp > /tmp/temperature");
+		system("sudo /opt/vc/bin/vcgencmd measure_temp > /mnt/sysdata/log/core_temp");
 		sleep(1);
 		// start cellular modem connection
 		system("sudo hologram network connect");
