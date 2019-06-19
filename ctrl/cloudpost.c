@@ -8,9 +8,9 @@
 #include "common.h"
 #include "ctrl_common.h"
 
-#define CLOUD_ACCEPT        "Accept: application/json"
-#define MAIN_URL			"http://bacson.tech/endpoint.php/postdata?"
-#define POST_DATA "uid=%s&coord=%s&temp=%s"
+#define CLOUD_ACCEPT	"Accept: application/json"
+#define MAIN_URL		"http://bacson.tech/endpoint.php/postdata?"
+#define POST_DATA		"uid=%s&coord=%s&temp=%s"
 
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
