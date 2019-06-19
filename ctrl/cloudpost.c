@@ -48,7 +48,7 @@ int postdata(char *coordinate)
 	}
 	
 	sprintf(pdata,POST_DATA,puid,coordinate,get_core_temp());
-    //logging(1,"%s\n", pdata);
+    logging(1,"%s\n", pdata);
 
     /* In windows, this will init the winsock stuff */ 
     curl_global_init(CURL_GLOBAL_ALL);

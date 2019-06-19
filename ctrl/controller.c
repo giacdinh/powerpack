@@ -124,7 +124,7 @@ use_default_gps:
 			system("sudo hologram network disconnect");	
 			sleep(2);
 		}		
-        sleep(6*60*60);
+        sleep((3*60*60)-15);
     }
 }
 

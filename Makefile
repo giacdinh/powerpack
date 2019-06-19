@@ -16,7 +16,7 @@ main_app: main.o
 		rm build.h
 
 timestamp:
-	echo "#define BUILDTIME \" `date`\" " > build.h
+	echo "#define BUILDTIME \" `date`\" \" commit: `git show |grep commit | cut -c 40-47`\" " > build.h
 
 clean:
 	rm *.o main_app 
