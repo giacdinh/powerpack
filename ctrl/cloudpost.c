@@ -10,7 +10,7 @@
 
 #define CLOUD_ACCEPT	"Accept: application/json"
 #define MAIN_URL		"http://bacson.tech/endpoint.php/postdata?"
-#define POST_DATA		"uid=%s&coord=%s&%s"
+#define POST_DATA		"uid=%s&coord=%s&temp=%s"
 
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -105,6 +105,6 @@ int get_core_temp(char *coretemp)
             return 1;
         }
     }
-    strcpy(coretemp,"temp=N/A");
+    strcpy(coretemp,"N/A");
     return -1;
 }
