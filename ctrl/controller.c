@@ -73,7 +73,7 @@ void *ctrl_worker_task()
 	static int gps_cnt = 0;
 	NMEA_RMC_T rmc;
 	char coord[128];
-	logging(1,"%s: Entering ...\n", __FUNCTION__);
+	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
     while(1) 
 	{
 		//try to get time from gps and set system time
@@ -96,7 +96,7 @@ void *ctrl_worker_task()
 		
 		if(-1 == coord_validate(&rmc))
 		{
-			logging(1, "Coordinate invalid. Sleep for a minute then loop for more data\n");
+			logging(DBG_ERROR, "Coordinate invalid. Sleep for a minute then loop for more data\n");
 			sleep(5);
 			continue;
 		}
@@ -119,7 +119,7 @@ use_default_gps:
 		else
 		{
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
-			logging(1, "coordinate: %s\n", (char *) &coord[0]);
+			logging(DBG_EVENT, "coordinate: %s\n", (char *) &coord[0]);
 			postdata((char *) &coord[0]);
 			
 			// disconnect modem and go back to waiting mode

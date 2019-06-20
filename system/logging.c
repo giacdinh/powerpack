@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define LOG_PRINT_LEVEL 1 
+#define LOG_PRINT_LEVEL DBG_EVENT 
 
 int logging(int level, char *logstr, ...)
 {
@@ -40,7 +40,7 @@ int logging(int level, char *logstr, ...)
 
 	if(fd < 0)
 	{
-		system("echo Failed to open logfile > ./zmgr_log");
+		system("echo Failed to open logfile > /mnt/sysdata/log/zmgr_log");
 		return -1;
 	}
 

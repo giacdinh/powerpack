@@ -54,7 +54,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 	fd = open(GPS_SERIAL_DEV, O_RDWR);
 	if( fd < 0)
 	{
-		printf("Serial port open failed: %s\n", GPS_SERIAL_DEV);
+		logging(DBG_ERROR,"Serial port open failed: %s\n", GPS_SERIAL_DEV);
 		return -1;
 	}
 
