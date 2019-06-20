@@ -13,13 +13,14 @@ extern "C"  {
 // Define each module message key value
 #define WD_MSGQ_KEY		    0x00001111
 #define CTRL_MSGQ_KEY		0x00002222
+#define REMOTEM_MSGQ_KEY	0x00003333
 
 #define SYS_MSG_TYPE 0xf1a322
 
 #define MSG_TIMEOUT 5 /* Try 5 second before read timeout */
 
 typedef enum {
-//	REMOTEM_MODULE_ID,
+	REMOTEM_MODULE_ID,
 	CTRL_MODULE_ID,
     UNKNOWN_MODULE_ID
 } MODULE_ID_ENUM;

@@ -64,7 +64,7 @@ int send_msg(int msgid, void *msg, int size, int timeout)
     	else
             return 0;
 
-    	usleep(50000);
+    	usleep(100000);
     	wait_cnt++;
     }
 }
@@ -93,7 +93,7 @@ int recv_msg(int msgid, void *msg, int size, int timeout)
             return 0;
         }
 
-        usleep(50000);
+        usleep(100000);
         wait_cnt++;
     }
 }

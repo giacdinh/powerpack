@@ -38,7 +38,7 @@ void send_msg_to_reader(int msg_id);
 int remotem_socket_create(void);
 void request_response_header(int new_remotem_sock);
 
-int remotem_main_task()
+void *remotem_main_task()
 {
     REMOTEM_MSG_T remotem_msg;
 	logging(DBG_DBG, "Create remotem message\n");
@@ -83,7 +83,7 @@ int remotem_main_task()
         remotem_msg_handler((REMOTEM_MSG_T *) &remotem_msg);
         sleep(1); //Should be lesser sleep
 	}
-
+	return (void *) 0;
 }
 
 void remotem_msg_handler(REMOTEM_MSG_T *Incoming)
@@ -99,25 +99,12 @@ void remotem_msg_handler(REMOTEM_MSG_T *Incoming)
 
 void *remotem_dog_bark_task()
 {
-	static int tem_cnt = 0;
-	static int udb_cnt = 0;
     while(1) 
 	{
         send_dog_bark(REMOTEM_MODULE_ID);
         sleep(1);
-		if(tem_cnt++ > 30)
-		{
-			system("sudo /opt/vc/bin/vcgencmd measure_temp >> ./tempurature");
-			system("sudo date >> ./tempurature");
-			tem_cnt = 0;
-		}
-		if(udb_cnt++ > 5)
-		{
-			printf("Broadcast UDP");
-			broadcast_id("powerpack");
-			udb_cnt = 0;
-		}
     }
+	return (void *) 0;
 }
 
 void *remotem_com_task()

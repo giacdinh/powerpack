@@ -15,7 +15,7 @@ void ctrl_msg_handler(CTRL_MSG_T *Incoming);
 int coord_validate(NMEA_RMC_T *rmc);
 int ping_host();
 
-int ctrl_main_task()
+void *ctrl_main_task()
 {
 	int result = -1;
 	pthread_t ctrl_wd_id = -1, ctrl_main_id = -1;
@@ -53,8 +53,9 @@ int ctrl_main_task()
 	while(1) {
         recv_msg(msgid, (void *) &ctrl_msg, sizeof(CTRL_MSG_T), MSG_TIMEOUT);
         ctrl_msg_handler((CTRL_MSG_T *) &ctrl_msg);
-        usleep(10000);
+        sleep(1);
 	}
+	return (void *) 0;
 }
 
 void *ctrl_dog_bark_task()
@@ -63,6 +64,7 @@ void *ctrl_dog_bark_task()
         send_dog_bark(CTRL_MODULE_ID);
         sleep(1);
     }
+	return (void *) 0;
 }
 
 void *ctrl_worker_task()
@@ -124,8 +126,9 @@ use_default_gps:
 			system("sudo hologram network disconnect");	
 			sleep(2);
 		}		
-        sleep((3*60*60)-15);
+        sleep(3*60*60);
     }
+	return (void *) 0;
 }
 
 void ctrl_msg_handler(CTRL_MSG_T *Incoming)

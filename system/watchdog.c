@@ -17,8 +17,7 @@ void UpdateBarkList(int Module);
 void register_modules();
 void wd_action();
 
-//char *modname[] = {"REMOTEM", "CTRL"};
-char *modname[] = {"CTRL"};
+char *modname[] = {"REMOTEM", "CTRL"};
 char *cmdname[] = {"Bark", "shutdown", "data"};
 
 unsigned long get_sys_cur_time()
@@ -44,9 +43,10 @@ void wdog_main_task()
     while(1) {
     	recv_msg(msgid, (void *) &wd_msg, sizeof(GENERIC_MSG_HEADER_T), 5);
     	wd_msg_handler((GENERIC_MSG_HEADER_T *) &wd_msg);
-    	usleep(10000);
+    	sleep(1);
     	wd_action();
     }
+	exit(0);
 }
 
 void wd_msg_handler(GENERIC_MSG_HEADER_T *Incoming)
@@ -69,6 +69,7 @@ void wd_msg_handler(GENERIC_MSG_HEADER_T *Incoming)
 void UpdateBarkList(int Module)
 {
     logging(DBG_INFO, "%s: ModID: %d Name: %s\n", __FUNCTION__, Module, modname[Module]);
+    //logging(1, "%s: ModID: %d Name: %s\n", __FUNCTION__, Module, modname[Module]);
     int i;
     for(i = 0; i < UNKNOWN_MODULE_ID; i++)
     {
@@ -97,29 +98,17 @@ void wd_action()
     for(i=0; i < UNKNOWN_MODULE_ID; i++)
     {
     	lcur_time = get_sys_cur_time();
-    	if((lcur_time - modulelist[i].timer) > 20)
-    		logging(DBG_WARNING, "Module: %s is marginally response...\n", modname[modulelist[i].module_id]);
+    	if( (lcur_time - modulelist[i].timer) > 20 && ((lcur_time - modulelist[i].timer) < 40) )
+    		logging(DBG_ERROR, "Module: %s is marginally response...\n", modname[modulelist[i].module_id]);
 
-    	else if((lcur_time - modulelist[i].timer) > ALLOWANCE_TIMER)
-        {
-	        // report module in trouble
-	        if((lcur_time - modulelist[i].timer) > 2*ALLOWANCE_TIMER)
-	        {
-		        logging(DBG_WARNING, "WARNING: %s not response in: %ds. timer_start: %d\n",
-			        modname[modulelist[i].module_id], (lcur_time - modulelist[i].timer),modulelist[i].reboot);
+    	else if( ((lcur_time - modulelist[i].timer) > 40) && ((lcur_time - modulelist[i].timer) < 60) )
+    		logging(DBG_ERROR, "Module: %s is no longer response...\n", modname[modulelist[i].module_id]);
 
-		        if(modulelist[i].reboot == 0)
-		        	modulelist[i].reboot = lcur_time;
-
-		        if(lcur_time -  modulelist[i].reboot > ALLOWANCE_TIMER)
-		        {
-		            logging(DBG_WARNING, "System about to be reboot\n");
-                    	    //TODO system("reboot");
-		        }
-	        }
-	    }
-	    else //reset reboot time for each module
-	    	modulelist[i].reboot = 0;
+		else if( (lcur_time - modulelist[i].timer) > 60)
+		{
+	        logging(DBG_ERROR, "System about to be reboot\n");
+			system("reboot");
+		}
     }
 }
 

@@ -7,9 +7,9 @@
 #include "build.h"
 
 #define APP_VERSION "1.0.1.6"
-extern void wdog_main_task();
-extern void remotem_main_task();
-extern void ctrl_main_task();
+extern void *wdog_main_task();
+extern void *remotem_main_task();
+extern void *ctrl_main_task();
 
 int main(int argc, char **argv)
 {
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     }
 
 	// Start remote
-#ifdef NOTUSE
+#ifndef NOTUSE
 	if(remotem_pid == -1)
     {
         remotem_pid = fork();
