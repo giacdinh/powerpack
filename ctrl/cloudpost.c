@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "common.h"
 #include "ctrl_common.h"
+#include "sys_msg.h"
 
 #define CLOUD_ACCEPT	"Accept: application/json"
 #define MAIN_URL		"http://bacson.tech/endpoint.php/postdata?"
@@ -15,7 +16,7 @@
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-	logging(DGB_INFO,"%s\n", (char *) ptr);
+	logging(DBG_INFO,"%s\n", (char *) ptr);
     return nmemb;
 }
 

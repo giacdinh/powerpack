@@ -6,6 +6,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include "common.h"
+#include "sys_msg.h"
 
 float gpsconvert(float value);
 
