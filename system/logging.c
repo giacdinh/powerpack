@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "sys_msg.h"
 
 #define LOG_PRINT_LEVEL DBG_EVENT 
 
