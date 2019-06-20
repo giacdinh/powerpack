@@ -70,7 +70,7 @@ void *ctrl_dog_bark_task()
 void *ctrl_worker_task()
 {
 	static int time_set_init = -1;  
-	static int gps_cnt = 0;
+	static int gps_cnt = 0, ping_cnt = 0;
 	NMEA_RMC_T rmc;
 	char coord[128];
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
@@ -108,13 +108,22 @@ use_default_gps:
 		// start cellular modem connection
 		system("sudo hologram network connect");
 		sleep(2);
-	
-		if(-1 == ping_host())
+host_ping_trial:	
+		if(-1 == ping_host() && ping_cnt++ < 3)
 		{
-			logging(DBG_ERROR,"Can't connect to host. Skip this post\n");	
-			// disconnect modem and go back to waiting mode
-			system("sudo hologram network disconnect");	
-			sleep(2);
+			if(ping_cnt >= 3)
+			{
+				ping_cnt = 0;
+				logging(DBG_ERROR,"Can't connect to host. Skip this post\n");	
+				// disconnect modem and go back to waiting mode
+				system("sudo hologram network disconnect");	
+				sleep(2);
+			}
+			else
+			{
+				sleep(2);
+				goto host_ping_trial;
+			}
 		}
 		else
 		{
