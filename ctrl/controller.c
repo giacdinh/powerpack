@@ -77,28 +77,30 @@ void *ctrl_worker_task()
     while(1) 
 	{
 		//try to get time from gps and set system time
-		if(!get_gps_info(&rmc))
+		if(-1 == get_gps_info(&rmc))
 		{
 			if(gps_cnt++ > 5)
 			{
 				rmc.rlat = 0.000001;
-				rmc.rlat = 0.000001;
+				rmc.rlong = 0.000001;
 				gps_cnt = 0;
 				logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
 				goto use_default_gps;
 			}
-			logging(DBG_ERROR,"%s: Error return\n", __FUNCTION__);
+			logging(DBG_ERROR,"%s: Error return, can't get GPS\n", __FUNCTION__);
 			sleep(5);
 			continue;
 		}
 		else
+		{
 			gps_cnt = 0;	// Reset when able to get GPS coordinate
 		
-		if(-1 == coord_validate(&rmc))
-		{
-			logging(DBG_ERROR, "Coordinate invalid. Sleep for a minute then loop for more data\n");
-			sleep(5);
-			continue;
+			if(-1 == coord_validate(&rmc))
+			{
+				logging(DBG_ERROR, "Coordinate invalid. Sleep for a minute then loop for more data\n");
+				sleep(60);
+				continue;
+			}
 		}
 
 use_default_gps:
@@ -106,6 +108,7 @@ use_default_gps:
 		system("sudo /opt/vc/bin/vcgencmd measure_temp > /mnt/sysdata/log/core_temp");
 		sleep(1);
 		// start cellular modem connection
+		logging(DBG_EVENT,"Get cellular connection\n");
 		system("sudo hologram network connect");
 		sleep(2);
 host_ping_trial:	
@@ -129,15 +132,16 @@ host_ping_trial:
 		else
 		{
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
-			logging(DBG_EVENT, "coordinate: %s\n", (char *) &coord[0]);
+			logging(DBG_EVENT, "1 coordinate: %s\n", (char *) &coord[0]);
 			postdata((char *) &coord[0]);
 			
 			// disconnect modem and go back to waiting mode
+			logging(DBG_EVENT,"Disconnect cellular connection\n");
 			system("sudo hologram network disconnect");	
 			sleep(2);
 		}		
 		logging(DBG_EVENT, "Sleep after data report done\n");
-        sleep(2*60*60);		// Sleep for 2 hours
+        sleep(30*60);		// Sleep for 2 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;

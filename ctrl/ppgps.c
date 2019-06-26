@@ -52,6 +52,14 @@ int get_gps_info(NMEA_RMC_T *rmc)
 	int readbyte;
 	char *src,*dest;
 	char GPGGA[128];
+
+	// Check to see if device node is ready
+	if(access(GPS_SERIAL_DEV, 0) != 0)
+	{
+		logging(DBG_ERROR,"GPS device not existed: %s\n", GPS_SERIAL_DEV);
+		return -1;
+	}
+		
 	fd = open(GPS_SERIAL_DEV, O_RDWR);
 	if( fd < 0)
 	{
