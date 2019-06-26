@@ -122,6 +122,7 @@ host_ping_trial:
 			else
 			{
 				sleep(2);
+				logging(DBG_EVENT, "Trying to ping host\n");
 				goto host_ping_trial;
 			}
 		}
@@ -135,7 +136,9 @@ host_ping_trial:
 			system("sudo hologram network disconnect");	
 			sleep(2);
 		}		
-        sleep(3*60*60);
+		logging(DBG_EVENT, "Sleep after data report done\n");
+        sleep(2*60*60);		// Sleep for 2 hours
+		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;
 }
