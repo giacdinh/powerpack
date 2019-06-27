@@ -141,7 +141,7 @@ host_ping_trial:
 			sleep(2);
 		}		
 		logging(DBG_EVENT, "Sleep after data report done\n");
-        sleep(30*60);		// Sleep for 2 hours
+        sleep(2*60*60);		// Sleep for 2 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;
