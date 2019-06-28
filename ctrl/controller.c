@@ -50,6 +50,9 @@ void *ctrl_main_task()
             logging(DBG_ERROR, "CTRL main task thread launch failed\n");
 	}
 
+	(void) pthread_join(ctrl_wd_id, NULL);
+	(void) pthread_join(ctrl_main_id, NULL);
+
 	while(1) {
         recv_msg(msgid, (void *) &ctrl_msg, sizeof(CTRL_MSG_T), MSG_TIMEOUT);
         ctrl_msg_handler((CTRL_MSG_T *) &ctrl_msg);
@@ -132,7 +135,7 @@ host_ping_trial:
 		else
 		{
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
-			logging(DBG_EVENT, "1 coordinate: %s\n", (char *) &coord[0]);
+			//logging(DBG_EVENT, "1 coordinate: %s\n", (char *) &coord[0]);
 			postdata((char *) &coord[0]);
 			
 			// disconnect modem and go back to waiting mode
@@ -140,8 +143,8 @@ host_ping_trial:
 			system("sudo hologram network disconnect");	
 			sleep(2);
 		}		
-		logging(DBG_EVENT, "Sleep after data report done\n");
-        sleep(2*60*60);		// Sleep for 2 hours
+		logging(DBG_EVENT, "Sleep 4 hours after data report done\n");
+        sleep(4*60*60);		// Sleep for 4 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;

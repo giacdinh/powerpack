@@ -52,7 +52,7 @@ int postdata(char *coordinate)
 	// get core temperature
 	get_core_temp(&coretemp[0]);
 	sprintf(pdata,POST_DATA,puid,coordinate,&coretemp[0]);
-    logging(DBG_INFO,"%s\n", pdata);
+    logging(DBG_EVENT,"%s\n", pdata);
 
     /* In windows, this will init the winsock stuff */ 
     curl_global_init(CURL_GLOBAL_ALL);
