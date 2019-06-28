@@ -64,8 +64,9 @@ void *ctrl_main_task()
 void *ctrl_dog_bark_task()
 {
     while(1) {
+		logging(1,"CTRL dog bark\n");
         send_dog_bark(CTRL_MODULE_ID);
-        sleep(1);
+        sleep(10);
     }
 	return (void *) 0;
 }
@@ -139,7 +140,7 @@ host_ping_trial:
 			postdata((char *) &coord[0]);
 			
 			// disconnect modem and go back to waiting mode
-			logging(DBG_EVENT,"Disconnect cellular connection\n");
+			logging(DBG_EVENT,"Disconnect cellular\n");
 			system("sudo hologram network disconnect");	
 			sleep(2);
 		}		
