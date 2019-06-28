@@ -69,7 +69,6 @@ void wd_msg_handler(GENERIC_MSG_HEADER_T *Incoming)
 void UpdateBarkList(int Module)
 {
     logging(DBG_INFO, "%s: ModID: %d Name: %s\n", __FUNCTION__, Module, modname[Module]);
-    //logging(1, "%s: ModID: %d Name: %s\n", __FUNCTION__, Module, modname[Module]);
     int i;
     for(i = 0; i < UNKNOWN_MODULE_ID; i++)
     {
@@ -95,16 +94,18 @@ void wd_action()
 {
     int i;
     unsigned long lcur_time;
+    lcur_time = get_sys_cur_time();
     for(i=0; i < UNKNOWN_MODULE_ID; i++)
     {
-    	lcur_time = get_sys_cur_time();
-    	if( (lcur_time - modulelist[i].timer) > 20 && ((lcur_time - modulelist[i].timer) < 40) )
+		// If not response in 60s warning
+    	if( (lcur_time - modulelist[i].timer) > 60 && ((lcur_time - modulelist[i].timer) < 120) )
     		logging(DBG_ERROR, "Module: %s is marginally response...\n", modname[modulelist[i].module_id]);
 
-    	else if( ((lcur_time - modulelist[i].timer) > 40) && ((lcur_time - modulelist[i].timer) < 60) )
+		// If not response in 120s error 
+    	else if( ((lcur_time - modulelist[i].timer) > 120) && ((lcur_time - modulelist[i].timer) < 180) )
     		logging(DBG_ERROR, "Module: %s is no longer response...\n", modname[modulelist[i].module_id]);
 
-		else if( (lcur_time - modulelist[i].timer) > 60)
+		else if( (lcur_time - modulelist[i].timer) > 180)
 		{
 	        logging(DBG_ERROR, "System about to be reboot\n");
 			system("reboot");
