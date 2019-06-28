@@ -101,7 +101,6 @@ void *remotem_dog_bark_task()
 {
     while(1) 
 	{
-		logging(1,"REMOTEM dog bark\n");
         send_dog_bark(REMOTEM_MODULE_ID);
         sleep(10);
     }

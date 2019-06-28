@@ -64,7 +64,6 @@ void *ctrl_main_task()
 void *ctrl_dog_bark_task()
 {
     while(1) {
-		logging(1,"CTRL dog bark\n");
         send_dog_bark(CTRL_MODULE_ID);
         sleep(10);
     }
