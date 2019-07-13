@@ -26,6 +26,13 @@ int main(int argc, char **argv)
         }
         return 0;
     }
+	sleep(5);
+	// Start cell network connection to git time
+	system("sudo hologram network disconnect");
+	sleep(1);
+	system("sudo hologram network connect");
+	sleep(15); // Make sure ntp doing it job
+	system("sudo hologram network disconnect");
 
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "\n");
@@ -33,10 +40,6 @@ int main(int argc, char **argv)
 	logging(DBG_DBG, "       Application %s %s start ...\n", APP_VERSION, BUILDTIME);
 	logging(DBG_DBG, "**********************************\n");
 	
-	// Sleep 10 second to make sure hardware is ready
-	logging(1,"Sleep 10 seconds makure sure hardware is ready\n");
-	sleep(10);
-
 	// Start watch dog for log
 	if(wdog_pid == -1)
 	{        

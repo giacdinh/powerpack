@@ -113,6 +113,9 @@ use_default_gps:
 		system("echo fwv=`/usr/local/bin/main_app -v |awk '{print $3}'` > /mnt/sysdata/log/version");
 		// start cellular modem connection
 		logging(DBG_EVENT,"Get cellular connection\n");
+		// Make sure PPP session start clean
+		system("sudo hologram network disconnect");
+		sleep(1);
 		system("sudo hologram network connect");
 		sleep(2);
 host_ping_trial:	
