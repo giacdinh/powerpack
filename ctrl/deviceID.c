@@ -16,7 +16,7 @@
 
 SSL_CTX		*sm_global_ctx=NULL;
 #define MAX_CERT_SIZE 2048
-#define DEVICE_ID_STRLEN 11
+#define DEVICE_ID_STRLEN 8 
 
 /* Default HW cryptodevice for the Flash project is the OCF cryptodev */
 #define FLASH25_SM_HW_ENGINE	"cryptodev"
