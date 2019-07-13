@@ -139,8 +139,8 @@ host_ping_trial:
 		else
 		{
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
-			logging(DBG_EVENT, "1 coordinate: %s\n", (char *) &coord[0]);
-			//postdata((char *) &coord[0]);
+			logging(DBG_EVENT, "coordinate: %s\n", (char *) &coord[0]);
+			postdata((char *) &coord[0]);
 			
 			// disconnect modem and go back to waiting mode
 			logging(DBG_EVENT,"Disconnect cellular\n");

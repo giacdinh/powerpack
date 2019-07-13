@@ -24,6 +24,8 @@ SSL_CTX		*sm_global_ctx=NULL;
 
 #define UNIT_CERT_LOC	"/mnt/sysdata/certs/unit-cert.pem"
 
+#define DEFAULT_UNITID "00000000"
+
 
 char *unit_ID()
 {
@@ -41,7 +43,7 @@ char *unit_ID()
 	if(fp == NULL)
 	{
 		printf("Error open certificate file\n");
-		return 0;
+		return DEFAULT_UNITID;
 	}
 
 	x509 = PEM_read_X509(fp, NULL, NULL, NULL);
