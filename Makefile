@@ -22,5 +22,5 @@ clean:
 	rm *.o main_app 
 
 depclean:
-	rm main_app main.o build.h system/system.a remotem/remotem.a remotem/*.o \
+	rm main_app main.o system/system.a remotem/remotem.a remotem/*.o \
 			ctrl/ctrl.a ctrl/*.o system/*.o

@@ -110,6 +110,7 @@ use_default_gps:
 		// get core temperature 
 		system("sudo /opt/vc/bin/vcgencmd measure_temp > /mnt/sysdata/log/core_temp");
 		sleep(1);
+		system("echo fwv=`/usr/local/bin/main_app -v |awk '{print $3}'` > /mnt/sysdata/log/version");
 		// start cellular modem connection
 		logging(DBG_EVENT,"Get cellular connection\n");
 		system("sudo hologram network connect");

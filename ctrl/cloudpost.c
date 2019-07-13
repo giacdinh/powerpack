@@ -11,7 +11,7 @@
 
 #define CLOUD_ACCEPT	"Accept: application/json"
 #define MAIN_URL		"http://bacson.tech/endpoint.php/postdata?"
-#define POST_DATA		"uid=%s&coord=%s&temp=%s"
+#define POST_DATA		"uid=%s&coord=%s&fwv=%s&temp=%s"
 
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -40,6 +40,7 @@ int postdata(char *coordinate)
 	char datafield[128], *pdata;
 	static char uid[32], *puid = NULL;
 	char coretemp[16];
+	char version[16];
 	
 	pdata = (char *) &datafield[0];
 
@@ -51,7 +52,8 @@ int postdata(char *coordinate)
 	
 	// get core temperature
 	get_core_temp(&coretemp[0]);
-	sprintf(pdata,POST_DATA,puid,coordinate,&coretemp[0]);
+	get_version(&version[0]);
+	sprintf(pdata,POST_DATA,puid,coordinate,&version[0],&coretemp[0]);
     logging(DBG_EVENT,"%s\n", pdata);
 
     /* In windows, this will init the winsock stuff */ 
@@ -100,7 +102,6 @@ int get_core_temp(char *coretemp)
         if(fd > 0)
         {
             fscanf(fd, "temp=%s",(char *) &core_temp[0]);
-            ret_temp = (char *) &core_temp[0];
             fclose(fd);
             strncpy(coretemp, (char *) &core_temp[0], 16);
             return 1;
@@ -109,3 +110,23 @@ int get_core_temp(char *coretemp)
     strcpy(coretemp,"N/A");
     return -1;
 }
+
+int get_version(char *version)
+{
+	char dversion[16];
+	FILE *fd;
+	if(access("/mnt/sysdata/log/version", 0 ) == 0)
+	{
+        fd = fopen("/mnt/sysdata/log/version", "r");
+        if(fd > 0)
+        {
+            fscanf(fd, "fwv=%s",(char *) &dversion[0]);
+            fclose(fd);
+            strncpy(version, (char *) &dversion[0], 16);
+            return 1;
+        }
+	}
+	strcpy(version,"N/A");
+	return -1;
+}
+
