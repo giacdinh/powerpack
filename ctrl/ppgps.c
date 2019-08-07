@@ -81,7 +81,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 		{
 			//printf("%s", (char *) &single_sentence);	
 			/* Pass to process to each sentence format */
-			if(temp = strstr((char *) &single_sentence, "$GPRMC"))
+			if(temp = strstr((char *) &single_sentence, "RMC"))
 			{
 				printf("%s\n", (char *) &single_sentence);
 				sscanf((char *) &single_sentence,"%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%15[^,],%15[^,]",

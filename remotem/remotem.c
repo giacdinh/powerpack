@@ -37,6 +37,7 @@ int remotem_request_handler(int);
 void send_msg_to_reader(int msg_id);
 int remotem_socket_create(void);
 void request_response_header(int new_remotem_sock);
+char *unit_ID();
 
 void *remotem_main_task()
 {
@@ -99,10 +100,21 @@ void remotem_msg_handler(REMOTEM_MSG_T *Incoming)
 
 void *remotem_dog_bark_task()
 {
+	static int broadcast_cnt = 0;
+    char unitid[32], *punitID;
+
+	punitID = (char *) &unitid[0];	
+    strcpy(punitID,(char *) unit_ID());
+
     while(1) 
 	{
-        send_dog_bark(REMOTEM_MODULE_ID);
-        sleep(10);
+        if(broadcast_cnt++ > 5)
+        {
+			send_dog_bark(REMOTEM_MODULE_ID);
+            broadcast_cnt = 0;
+            broadcast_id(punitID);
+        }
+        sleep(1);
     }
 	return (void *) 0;
 }

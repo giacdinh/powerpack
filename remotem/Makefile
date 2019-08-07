@@ -3,7 +3,7 @@ CFLAGS=-I../inc
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-OBJS=remotem.o broadcast_id.o
+OBJS=remotem.o broadcast_id.o deviceID.o
 
 remotem.a: $(OBJS)
 	ar rc remotem.a *.o

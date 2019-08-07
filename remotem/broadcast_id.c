@@ -9,7 +9,8 @@
 #include <unistd.h>
 #include <errno.h>
 
-#define BROADCAST_IP	"255.255.255.255"
+//#define BROADCAST_IP	"255.255.255.255"
+#define BROADCAST_IP	"192.168.1.255" //Broadcast only on internal AP subnet
 #define BROADCAST_PORT	2999
 
 void broadcast_id(char *mess)
