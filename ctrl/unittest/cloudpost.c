@@ -7,7 +7,7 @@
 
 #define CLOUD_ACCEPT        "Accept: application/json"
 #define MAIN_URL			"http://bacson.tech/endpoint.php/postdata?"
-#define POST_DATA "uid=pp_000000001&coord=28.703239,%20-81.204086"
+#define POST_DATA "uid=PP000007&fwv=1.0.2&coord=28.703239,%20-81.204086&temp=42"
 
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
