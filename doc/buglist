@@ -1,3 +1,5 @@
 
 #1  After login, session expire should totally kick out everything
 #2  Login page should remember previous user if select
+#3  Avoid double display row. Move longest and change field. (ex. address) to the last column to avoi    change
+#4  Standardize DATE/TIME format (Ex. MM/DD/YY and HH:MM)
