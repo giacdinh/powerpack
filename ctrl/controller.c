@@ -65,7 +65,7 @@ void *ctrl_dog_bark_task()
 {
     while(1) {
         send_dog_bark(CTRL_MODULE_ID);
-        sleep(10);
+        sleep(BARK_DURATION);
     }
 	return (void *) 0;
 }
@@ -77,6 +77,7 @@ void *ctrl_worker_task()
 	NMEA_RMC_T rmc;
 	char coord[128];
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
+
     while(1) 
 	{
 		//try to get time from gps and set system time

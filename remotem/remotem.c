@@ -15,14 +15,13 @@
 #include <sys/wait.h>
 #include <arpa/inet.h>
 
+#include <common.h>
 #include "remotem.h"
 #include "remotem_common.h"
 #include <sys_msg.h>
 
 #define REMOTEM_LOCAL_IPADDR    "127.0.0.1"
 static struct sockaddr_in gWebServerAddr;
-#define WEB_SERVER_PORT         (81)
-#define REMOTEM_PROXY_PORT      (5010)
 #define REMOTEM_WAIT_PORT_AVAILABLE (60)  //seconds
 #define REMOTEM_BACKLOG         (10)
 #define REQUEST_MAX				(256)
@@ -100,7 +99,6 @@ void remotem_msg_handler(REMOTEM_MSG_T *Incoming)
 
 void *remotem_dog_bark_task()
 {
-	static int broadcast_cnt = 0;
     char unitid[32], *punitID;
 
 	punitID = (char *) &unitid[0];	
@@ -108,13 +106,9 @@ void *remotem_dog_bark_task()
 
     while(1) 
 	{
-        if(broadcast_cnt++ > 5)
-        {
-			send_dog_bark(REMOTEM_MODULE_ID);
-            broadcast_cnt = 0;
-            broadcast_id(punitID);
-        }
-        sleep(1);
+		send_dog_bark(REMOTEM_MODULE_ID);
+        broadcast_id(punitID);
+        sleep(BARK_DURATION);
     }
 	return (void *) 0;
 }
@@ -183,7 +177,7 @@ int remotem_socket_create(void)
     }
     memset(&REMOTEMSocketAddr, 0, sizeof(REMOTEMSocketAddr));
     REMOTEMSocketAddr.sin_family = AF_INET;
-    REMOTEMSocketAddr.sin_port = htons(9999);
+    REMOTEMSocketAddr.sin_port = htons(REMOTE_CGI_PORT);
     REMOTEMSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     lng.l_onoff  = 0;
@@ -223,12 +217,14 @@ int remotem_request_handler(int new_remotem_sock)
 	int read_byte;
 
 	read_byte = read(new_remotem_sock, &income_request, REQUEST_MAX);
-	//logging(DBG_DBG, "Request: %s\n", &income_request);
+	logging(1, "Request: %s\n", &income_request);
 	request_response_header(new_remotem_sock);
-//	if(NULL != strstr((char *) income_request, REMOTEM_TAG_READ))
-//	{
-//		remotem_tag_read();
-//	}
+	if(NULL != strstr((char *) income_request, REMOTEM_TEST_CMD))
+	{
+		logging(1,"REMOTEM TEST CMD\n");	
+	}
+
+	write(new_remotem_sock, "200 OK\n", 7);
 	close(new_remotem_sock);
 	return 0;
 }

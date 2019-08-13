@@ -27,6 +27,7 @@ int main(int argc, char **argv)
         }
         return 0;
     }
+
 	sleep(5);
 	// Start cell network connection to git time
 	system("sudo hologram network disconnect");
