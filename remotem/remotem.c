@@ -223,6 +223,12 @@ int remotem_request_handler(int new_remotem_sock)
 	{
 		logging(1,"REMOTEM TEST CMD\n");	
 	}
+	if(NULL != strstr((char *) income_request, REMOTEM_DEV_ID))
+	{
+		logging(1,"REMOTEM Device ID\n");
+		write(new_remotem_sock, GENERAL_RESPONSE_HEADER, strlen(GENERAL_RESPONSE_HEADER));
+        write(new_remotem_sock, unit_ID(), 8);
+	}
 
 	write(new_remotem_sock, "200 OK\n", 7);
 	close(new_remotem_sock);
