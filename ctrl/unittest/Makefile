@@ -11,4 +11,4 @@ deviceID:
 	gcc -o deviceID deviceID.c -lssl -lcrypto 
 
 clean:
-	rm unittest
+	rm cloudpost deviceID unittest
