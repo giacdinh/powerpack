@@ -219,17 +219,26 @@ int remotem_request_handler(int new_remotem_sock)
 	read_byte = read(new_remotem_sock, &income_request, REQUEST_MAX);
 	logging(1, "Request: %s\n", &income_request);
 	request_response_header(new_remotem_sock);
-	if(NULL != strstr((char *) income_request, REMOTEM_TEST_CMD))
+	if(NULL != strstr((char *) &income_request[0], REMOTEM_TEST_CMD))
 	{
 		logging(1,"REMOTEM TEST CMD\n");	
 	}
-	if(NULL != strstr((char *) income_request, REMOTEM_DEV_ID))
+	if(NULL != strstr((char *) &income_request[0], REMOTEM_DEV_ID))
 	{
 		logging(1,"REMOTEM Device ID\n");
 		write(new_remotem_sock, GENERAL_RESPONSE_HEADER, strlen(GENERAL_RESPONSE_HEADER));
         write(new_remotem_sock, unit_ID(), 8);
 	}
-
+    else if(NULL != strstr((char *) &income_request[0], REMOTEM_SYS_SHUTDOWN))
+    {
+        logging(1,"System shutdown\n");
+        system("sudo shutdown -h now");
+    }
+    else if(NULL != strstr((char *) &income_request[0], REMOTEM_SYS_REBOOT))
+    {
+        logging(1,"System reboot\n");
+        system("sudo reboot");
+    }
 	write(new_remotem_sock, "200 OK\n", 7);
 	close(new_remotem_sock);
 	return 0;
