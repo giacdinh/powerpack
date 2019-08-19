@@ -3,3 +3,9 @@
 #2  Login page should remember previous user if select
 #3  Avoid double display row. Move longest and change field. (ex. address) to the last column to avoi    change
 #4  Standardize DATE/TIME format (Ex. MM/DD/YY and HH:MM)
+08/19/19
+#5  Put BS logo login page
+#6  Customer table page should have their logo
+#7  Put time and date display on customer table page
+#8  Remove days left column
+#9  Display font in "Devices" column should be equal size like all other
