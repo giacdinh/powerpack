@@ -14,6 +14,7 @@ extern "C"  {
 #define WD_MSGQ_KEY		    0x00001111
 #define CTRL_MSGQ_KEY		0x00002222
 #define REMOTEM_MSGQ_KEY	0x00003333
+#define CONFIG_MSGQ_KEY		0x00004444
 
 #define SYS_MSG_TYPE 0xf1a322
 
@@ -22,6 +23,7 @@ extern "C"  {
 typedef enum {
 	REMOTEM_MODULE_ID,
 	CTRL_MODULE_ID,
+	CONFIG_MODULE_ID,
     UNKNOWN_MODULE_ID
 } MODULE_ID_ENUM;
 
@@ -46,6 +48,10 @@ typedef struct {
 typedef struct {
     GENERIC_MSG_HEADER_T header;
 } CTRL_MSG_T;
+
+typedef struct {
+    GENERIC_MSG_HEADER_T header;
+} CONFIG_MSG_T;
 
 typedef enum {
     DBG_ERROR = 0,

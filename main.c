@@ -18,6 +18,7 @@ int main(int argc, char **argv)
 	pid_t wdog_pid = -1;
 	pid_t remotem_pid = -1;
 	pid_t ctrl_pid = -1;
+	pid_t conf_pid = -1;
 
     if(argc > 1)
     {
@@ -62,10 +63,21 @@ int main(int argc, char **argv)
         if(remotem_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch remotem task ID: %i\n", getpid());
-	    prctl(PR_SET_NAME,"main_app_rm");
+			prctl(PR_SET_NAME,"main_app_rm");
             remotem_main_task();
-        }   
-    }	
+        }
+    }
+
+	if(conf_pid == -1)
+    {
+        conf_pid = fork();
+        if(conf_pid == 0) // child process
+        {
+            logging(DBG_DBG, "Launch config task ID: %i\n", getpid());
+			prctl(PR_SET_NAME,"main_app_conf");
+            config_main_task();
+        }
+	} 
 #endif
 
 	// Start controller 

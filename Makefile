@@ -3,7 +3,7 @@ CFLAGS=-I./inc
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-SUBDIRS = system ctrl remotem
+SUBDIRS = system ctrl remotem config
 
 subdirs:
 	for dir in $(SUBDIRS); do \
@@ -12,7 +12,7 @@ subdirs:
 
 main_app: main.o
 		gcc -o main_app main.o system/system.a remotem/remotem.a \
-				ctrl/ctrl.a -lpthread -lcurl -lssl -lcrypto
+				ctrl/ctrl.a config/config.a -ljson-c -lpthread -lcurl -lssl -lcrypto
 		rm build.h
 
 timestamp:
@@ -23,4 +23,4 @@ clean:
 
 depclean:
 	rm main_app main.o system/system.a remotem/remotem.a remotem/*.o \
-			ctrl/ctrl.a ctrl/*.o system/*.o
+			ctrl/ctrl.a ctrl/*.o config/config.a config/*.o system/*.o
