@@ -9,6 +9,12 @@
 #include "common.h"
 #include "ctrl_common.h"
 
+#ifdef UNIT_DEBUG
+#define DBG_CTRL  1
+#else
+#define DBG_CTRL  10
+#endif
+
 void *ctrl_dog_bark_task();
 void *ctrl_worker_task();
 void ctrl_msg_handler(CTRL_MSG_T *Incoming);

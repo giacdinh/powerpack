@@ -11,6 +11,7 @@
 extern void *wdog_main_task();
 extern void *remotem_main_task();
 extern void *ctrl_main_task();
+extern void *conf_main_task();
 
 int main(int argc, char **argv)
 {
@@ -29,6 +30,8 @@ int main(int argc, char **argv)
         return 0;
     }
 
+#ifndef NOTUSE
+#else
 	sleep(5);
 	// Start cell network connection to git time
 	system("sudo hologram network disconnect");
@@ -36,7 +39,7 @@ int main(int argc, char **argv)
 	system("sudo hologram network connect");
 	sleep(15); // Make sure ntp doing it job
 	system("sudo hologram network disconnect");
-
+#endif
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "**********************************\n");
@@ -75,10 +78,10 @@ int main(int argc, char **argv)
         {
             logging(DBG_DBG, "Launch config task ID: %i\n", getpid());
 			prctl(PR_SET_NAME,"main_app_conf");
-            config_main_task();
+            conf_main_task();
         }
 	} 
-#endif
+#else
 
 	// Start controller 
 	if(ctrl_pid == -1)
@@ -91,7 +94,7 @@ int main(int argc, char **argv)
             ctrl_main_task();
         }   
     }	
-
+#endif
 	while(1) {
 		sleep(100); // Main task done after launch children processes
 	}

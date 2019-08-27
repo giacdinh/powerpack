@@ -20,7 +20,7 @@ int config_init();
 #define DBG_CONFIG  10
 #endif
 
-void *config_main_task()
+void *conf_main_task()
 {
 	int result = -1;
 	pthread_t config_wd_id = -1, config_cmd_id = -1;
@@ -128,8 +128,21 @@ int config_init()
 		for(i=0; i < CONFIG_ENUM_UNKNOWN; i++)
 		{
 			switch(i) {
+				case UNITID:
+					strncpy(config.unitid, process_json_data((char *) &confbuf[0], CONFIG_FIELD[UNITID], 0),MAX_CONFIG_SZ);
+                    logging(DBG_CONFIG, "UNITID: %s\n", config.unitid);
+					break;
+				case POSTURL:
+					strncpy(config.posturl, process_json_data((char *) &confbuf[0], CONFIG_FIELD[POSTURL], 0),MAX_CONFIG_SZ);
+                    logging(DBG_CONFIG, "posturl: %s\n", config.posturl);
+					break;
+				case ENDPOINT:
+					strncpy(config.endpoint, process_json_data((char *) &confbuf[0], CONFIG_FIELD[ENDPOINT], 0),MAX_CONFIG_SZ);
+                    logging(DBG_CONFIG, "Endpoint: %s\n", config.endpoint);
+					break;
 				case METRIC:
 					process_json_data((char *) &confbuf[0], CONFIG_FIELD[METRIC], &(config.metric));
+					logging(DBG_CONFIG,"Metric: %s\n", config.metric==1?"F":"C");
 					break;
 				default:
 					logging(DBG_ERROR, "CONFIG FIELDs loading ID invalid: %d\n", i);
@@ -141,5 +154,6 @@ int config_init()
 	else
 		logging(DBG_ERROR,"Attempt to read config file failed\n");
 
+	return 0;	
 }
 

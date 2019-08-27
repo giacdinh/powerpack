@@ -26,6 +26,12 @@ static struct sockaddr_in gWebServerAddr;
 #define REMOTEM_BACKLOG         (10)
 #define REQUEST_MAX				(256)
 
+#ifdef UNIT_DEBUG
+#define DBG_REM  1
+#else
+#define DBG_REM  10
+#endif
+
 void remotem_msg_handler(REMOTEM_MSG_T *Incoming);
 void *remotem_dog_bark_task();
 void *remotem_com_task();
@@ -125,7 +131,7 @@ void *remotem_com_task()
         logging(DBG_ERROR, "%s %d: Failed to create socket \n", __FUNCTION__, __LINE__);
     }
 
-    logging(DBG_DBG, "%s %d: looping for remote connect\n", __FUNCTION__, __LINE__);
+    logging(DBG_DBG, "%s %d: looping for remote connect sock: %d\n", __FUNCTION__, __LINE__, remotem_socketId);
     if((listen(remotem_socketId, REMOTEM_BACKLOG)) < 0)
     {
         if (errno != EINTR)
@@ -167,7 +173,7 @@ int remotem_socket_create(void)
     struct linger lng;
     int reuseAddr = 1;
 
-	logging(DBG_ERROR, "%s %d: Entering socket create...\n", __FUNCTION__, __LINE__);
+	logging(DBG_INFO, "%s %d: Entering socket create...\n", __FUNCTION__, __LINE__);
     /* Create a Socket using the Security Manager API .*/
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (-1 == sock)
@@ -207,7 +213,6 @@ int remotem_socket_create(void)
         return -1;
     }
 
-	logging(DBG_ERROR, "%s %d: Socket: %d created\n", __FUNCTION__, __LINE__, sock);
     return sock;
 }
 
