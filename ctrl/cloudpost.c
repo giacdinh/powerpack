@@ -8,10 +8,16 @@
 #include "common.h"
 #include "ctrl_common.h"
 #include "sys_msg.h"
+#include "dev_config.h"
 
 #define CLOUD_ACCEPT	"Accept: application/json"
-#define MAIN_URL		"http://bacson.tech/endpoint.php/postdata?"
+#define DEFAULT_URL		"http://bacson.tech/postdata.php/postdata?"
 #define POST_DATA		"uid=%s&coord=%s&fwv=%s&temp=%s"
+
+static int server_connect = 1; //use this flag to toggle between default and config URL
+
+extern int get_config_url(char *url);
+extern int get_str_json(int itemID, char *strdata);
 
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -27,7 +33,10 @@ static size_t Cloud_Header_Response(char *buffer, size_t size, size_t nitems, vo
 		if(strstr(buffer, "200 OK"))
 			logging(DBG_EVENT,"response OK\n");	
 		else
+		{
+			server_connect = 0;
 			logging(DBG_INFO,"%s\n",buffer);
+		}
     }
     return nitems;
 }
@@ -41,6 +50,14 @@ int postdata(char *coordinate)
 	static char uid[32], *puid = NULL;
 	char coretemp[16];
 	char version[16];
+	char configURL[512];
+
+	if(server_connect == 1)
+	{
+		bzero((char *) &configURL[0], 512);
+		get_config_url(&configURL[0]);
+		logging(1, "Config URL: %s\n", (char *) &configURL[0]);
+	}
 	
 	pdata = (char *) &datafield[0];
 
@@ -65,10 +82,13 @@ int postdata(char *coordinate)
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Cloud_Response);
         curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, Cloud_Header_Response);
 
-		curl_easy_setopt(curl, CURLOPT_URL, MAIN_URL);
+		if(server_connect == 0) // If config URL failed use default URL
+			curl_easy_setopt(curl, CURLOPT_URL, DEFAULT_URL);
+		else if(server_connect == 1)
+			curl_easy_setopt(curl, CURLOPT_URL,(char *) &configURL[0]);
  
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-//	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+		//curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
@@ -130,3 +150,12 @@ int get_version(char *version)
 	return -1;
 }
 
+int get_config_url(char *url)
+{
+	char posturl[256], endpoint[256];
+	get_str_json(POSTURL,(char *) &posturl[0]);
+	get_str_json(ENDPOINT,(char *) &endpoint[0]);
+	sprintf(url,"%s%s",&posturl[0],&endpoint[0]);
+
+	return 0;
+}

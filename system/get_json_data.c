@@ -39,9 +39,6 @@ int get_str_json(int itemID, char *strdata)
 	}
 	else
 		return -1;
-
-
-
 }
 
 int get_int_json(int itemID, int *intdata)

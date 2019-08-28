@@ -6,8 +6,12 @@
 #include <stdlib.h>
 
 #define CLOUD_ACCEPT        "Accept: application/json"
-#define MAIN_URL			"http://bacson.tech/endpoint.php/postdata?"
+//#define MAIN_URL			"http://bacson.tech/endpoint.php/postdata?"
+#define MAIN_URL			"http://bacson.tech/postdata.php/postdata?"
 #define POST_DATA "uid=PP000007&fwv=1.0.2&coord=28.703239,%20-81.204086&temp=42"
+
+ #define POSTURL 1
+ #define ENDPOINT 2
 
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -33,7 +37,12 @@ int main()
     CURL *curl;
     CURLcode res;
     struct curl_slist *headers = NULL;
+    char configURL[512];
 
+    bzero((char *) &configURL[0], 512);
+    get_config_url(&configURL[0]);
+    printf("Config URL: %s\n", (char *) &configURL[0]);
+	
     //logger_cloud("%s: Entering ... ", __FUNCTION__);
 
     //headers = curl_slist_append(headers, (char *) &Accept);
@@ -76,4 +85,14 @@ int main()
     curl_global_cleanup();
 
     return 1;
+}
+
+int get_config_url(char *url)
+{
+    char posturl[256], endpoint[256];
+    get_str_json(POSTURL,(char *) &posturl[0]);
+    get_str_json(ENDPOINT,(char *) &endpoint[0]);
+    sprintf(url,"%s%s",&posturl[0],&endpoint[0]);
+
+    return 0;
 }
