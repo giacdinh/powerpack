@@ -15,7 +15,7 @@ int set_serial(int fd, int speed)
     struct termios tty;
 
     if (tcgetattr(fd, &tty) < 0) {
-        printf("Error from tcgetattr: %s\n", strerror(errno));
+        logging(DBG_ERROR, "Error from tcgetattr: %s\n", strerror(errno));
         return -1;
     }
 
@@ -39,7 +39,7 @@ int set_serial(int fd, int speed)
     tty.c_cc[VTIME] = 1;
 
     if (tcsetattr(fd, TCSANOW, &tty) != 0) {
-        printf("Error from tcsetattr: %s\n", strerror(errno));
+        logging(DBG_ERROR, "Error from tcsetattr: %s\n", strerror(errno));
         return -1;
     }
     return 0;
@@ -83,7 +83,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 			/* Pass to process to each sentence format */
 			if(temp = strstr((char *) &single_sentence, "RMC"))
 			{
-				printf("%s\n", (char *) &single_sentence);
+				//printf("%s\n", (char *) &single_sentence);
 				sscanf((char *) &single_sentence,"%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%15[^,],%15[^,]",
 					rmc->gpstype, rmc->gpstime, rmc->gpswarn, rmc->gpslat, rmc->gpslatpos,
 					rmc->gpslong, rmc->gpslongpos, rmc->gpsspeed, rmc->gpscourse, rmc->gpsdate);
