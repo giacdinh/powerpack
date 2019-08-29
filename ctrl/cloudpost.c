@@ -16,8 +16,7 @@
 
 static int server_connect = 1; //use this flag to toggle between default and config URL
 
-extern int get_config_url(char *url);
-extern int get_str_json(int itemID, char *strdata);
+int get_config_url(char *url);
 
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)

@@ -17,7 +17,7 @@ typedef enum {
 	CONFIG_ENUM_UNKNOWN
 } CONFIG_ENUM;
 
-char CONFIG_FIELD[CONFIG_ENUM_UNKNOWN][MAX_CONFIG_SZ] = {
+static char CONFIG_FIELD[CONFIG_ENUM_UNKNOWN][MAX_CONFIG_SZ] = {
 	"unitid",
 	"posturl",
 	"endpoint",

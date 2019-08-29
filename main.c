@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     }
 
 	// Start remote
-#ifndef NOTUSE
+
 	if(remotem_pid == -1)
     {
         remotem_pid = fork();
@@ -81,7 +81,6 @@ int main(int argc, char **argv)
             conf_main_task();
         }
 	} 
-#else
 
 	// Start controller 
 	if(ctrl_pid == -1)
@@ -94,7 +93,7 @@ int main(int argc, char **argv)
             ctrl_main_task();
         }   
     }	
-#endif
+
 	while(1) {
 		sleep(100); // Main task done after launch children processes
 	}
