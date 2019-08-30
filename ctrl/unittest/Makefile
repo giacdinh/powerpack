@@ -1,5 +1,5 @@
 
-all: clean unittest deviceID
+all: unittest deviceID gps cloudpost
 
 unittest:
 	gcc -o unittest unittest.c -I../../inc
@@ -11,5 +11,8 @@ cloudpost:
 deviceID:
 	gcc -o deviceID deviceID.c -lssl -lcrypto 
 
+gps:
+	gcc -o gps ppgps.c -I../../inc ../../system/logging.o
+
 clean:
-	rm cloudpost deviceID unittest
+	rm cloudpost deviceID unittest gps
