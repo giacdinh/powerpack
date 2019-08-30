@@ -140,6 +140,14 @@ int config_init()
 					strncpy(config.endpoint, process_json_data((char *) &confbuf[0], CONFIG_FIELD[ENDPOINT], 0),MAX_CONFIG_SZ);
                     logging(DBG_CONFIG, "Endpoint: %s\n", config.endpoint);
 					break;
+				case HOMELAT:
+					strncpy(config.homelat, process_json_data((char *) &confbuf[0], CONFIG_FIELD[HOMELAT], 0),MAX_CONFIG_SZ);
+                    logging(DBG_CONFIG, "Home Lat: %s\n", config.homelat);
+					break;
+				case HOMELONG:
+					strncpy(config.homelong, process_json_data((char *) &confbuf[0], CONFIG_FIELD[HOMELONG], 0),MAX_CONFIG_SZ);
+                    logging(DBG_CONFIG, "Home Long: %s\n", config.homelong);
+					break;
 				case METRIC:
 					process_json_data((char *) &confbuf[0], CONFIG_FIELD[METRIC], &(config.metric));
 					logging(DBG_CONFIG,"Metric: %s\n", config.metric==1?"F":"C");

@@ -2,5 +2,7 @@
 "unitid":"BS000002",
 "posturl":"www.bacson.tech",
 "endpoint":"/postdata.php?postdata",
+"homelat":"0.00001",
+"homelong":"0.00001",
 "metric":1
 }
