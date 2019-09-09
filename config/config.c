@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <string.h>
 #include "dev_config.h"
+#include "common.h"
 
 void *config_dog_bark_task();
 void config_msg_handler(CONFIG_MSG_T *Incoming);
@@ -74,10 +75,11 @@ void *conf_main_task()
 void *config_dog_bark_task()
 {
 	// config start well ahead of most module bark need to wait
+	logging(1,"%s: Entering\n", __FUNCTION__);
 	sleep(7);
     while(1) {
         send_dog_bark(CONFIG_MODULE_ID);
-        sleep(1);
+        sleep(BARK_DURATION);
     }
 }
 

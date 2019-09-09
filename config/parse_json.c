@@ -9,6 +9,7 @@
 
 #define JSON_TRUE	1
 #define JSON_FALSE	0
+#define NULL_STRING "N/A"
 
 const char *process_json_data(char *ptr, char *search_key, int  *getint)
 {
@@ -38,6 +39,6 @@ const char *process_json_data(char *ptr, char *search_key, int  *getint)
         }
     }
     logging(DBG_DBG,"%s: no match for key search: %s", __FUNCTION__, search_key);
-    return NULL;
+    return NULL_STRING;
 }
 
