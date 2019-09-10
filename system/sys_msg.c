@@ -97,3 +97,8 @@ int recv_msg(int msgid, void *msg, int size, int timeout)
         wait_cnt++;
     }
 }
+
+char *sys_dev_id()
+{
+	return unit_ID();
+}

@@ -15,7 +15,7 @@
 #include <sys/wait.h>
 #include <arpa/inet.h>
 
-#include <common.h>
+#include "common.h"
 #include "remotem.h"
 #include "remotem_common.h"
 #include <sys_msg.h>
@@ -42,16 +42,16 @@ int remotem_request_handler(int);
 void send_msg_to_reader(int msg_id);
 int remotem_socket_create(void);
 void request_response_header(int new_remotem_sock);
-char *unit_ID();
+void *remotem_id_broadcast_task();
 
 void *remotem_main_task()
 {
     REMOTEM_MSG_T remotem_msg;
+	pthread_t remotem_dog_id = -1, remotem_com_id = -1;
 	logging(DBG_DBG, "Create remotem message\n");
     int msgid = create_msg(REMOTEM_MSGQ_KEY);
 	int result = -1;
 
-	pthread_t remotem_dog_id = -1, remotem_com_id = -1;
     if(msgid < 0)
     {
         printf("Failed to create remotem message queue\n");
@@ -84,7 +84,7 @@ void *remotem_main_task()
     (void) pthread_join(remotem_com_id, NULL);
 
 	while(1) {
-		logging(DBG_DBG, " REMOTEM Main task loop\n");
+		logging(DBG_REM, " REMOTEM Main task loop\n");
         recv_msg(msgid, (void *) &remotem_msg, sizeof(REMOTEM_MSG_T), MSG_TIMEOUT);
         remotem_msg_handler((REMOTEM_MSG_T *) &remotem_msg);
         sleep(1); //Should be lesser sleep
@@ -105,15 +105,9 @@ void remotem_msg_handler(REMOTEM_MSG_T *Incoming)
 
 void *remotem_dog_bark_task()
 {
-    char unitid[32], *punitID;
-
-	punitID = (char *) &unitid[0];	
-    strcpy(punitID,(char *) unit_ID());
-
     while(1) 
 	{
 		send_dog_bark(REMOTEM_MODULE_ID);
-        broadcast_id(punitID);
         sleep(BARK_DURATION);
     }
 	return (void *) 0;

@@ -12,6 +12,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/engine.h>
+#include "common.h"
 
 
 SSL_CTX		*sm_global_ctx=NULL;

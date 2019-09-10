@@ -75,6 +75,7 @@ void UpdateBarkList(int Module)
     	if(modulelist[i].module_id == Module)
     	{
     		modulelist[i].timer = get_sys_cur_time();
+			break;
     	}
     }
 }

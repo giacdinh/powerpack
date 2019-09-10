@@ -76,6 +76,7 @@ void send_dog_bark(int);
 int logging(int level, char *logstr, ...);
 int open_msg(key_t key);
 int get_str_json(int itemID, char *strdata);
+char *unit_ID();
 
 extern char *module_list[];
 extern char *modname[];
