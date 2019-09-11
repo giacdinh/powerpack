@@ -15,6 +15,9 @@
 #include <arpa/inet.h>
 #include "../../inc/common.h"
 
+extern char * unit_ID();
+extern int broadcast_id(char *);
+
 
 int main()
 {
