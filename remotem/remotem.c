@@ -105,9 +105,20 @@ void remotem_msg_handler(REMOTEM_MSG_T *Incoming)
 
 void *remotem_dog_bark_task()
 {
+	int udp_cnt = 0;
+	char unitid[32], *punitID;
+
+	punitID = (char *) &unitid[0];
+	strcpy(punitID,(char *) unit_ID());
+
     while(1) 
 	{
 		send_dog_bark(REMOTEM_MODULE_ID);
+		if(udp_cnt > 3)
+			broadcast_id(punitID);
+		else
+			udp_cnt++;
+
         sleep(BARK_DURATION);
     }
 	return (void *) 0;
