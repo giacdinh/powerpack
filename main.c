@@ -30,8 +30,6 @@ int main(int argc, char **argv)
         return 0;
     }
 
-#ifndef NOTUSE
-#else
 	sleep(5);
 	// Start cell network connection to git time
 	system("sudo hologram network disconnect");
@@ -39,7 +37,7 @@ int main(int argc, char **argv)
 	system("sudo hologram network connect");
 	sleep(15); // Make sure ntp doing it job
 	system("sudo hologram network disconnect");
-#endif
+
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "**********************************\n");

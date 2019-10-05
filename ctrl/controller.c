@@ -78,7 +78,7 @@ void *ctrl_dog_bark_task()
 
 void *ctrl_worker_task()
 {
-	static int time_set_init = -1;  
+	static int time_set_init = -1, usb_init = -1;  
 	static int gps_cnt = 0, ping_cnt = 0;
 	NMEA_RMC_T rmc;
 	char coord[128];
@@ -86,6 +86,17 @@ void *ctrl_worker_task()
 
     while(1) 
 	{
+		if(usb_init == -1)
+		{
+			usb_init = 1; // If init USB port already on
+		}
+		else if(usb_init == 1)
+		{
+			// Turn on USB hub
+			system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/bind");
+			// Wait for 30 second for it to be ready to use
+			sleep(30);
+		}
 		//try to get time from gps and set system time
 		if(-1 == get_gps_info(&rmc))
 		{
@@ -155,6 +166,12 @@ host_ping_trial:
 			sleep(2);
 		}		
 		logging(DBG_EVENT, "Sleep 4 hours after data report done\n");
+#ifndef DEV_DEBUG
+		system("sudo shutdown -h now");
+#endif
+
+		// Turn of USB hub to conserv raspi energy in case of battery being used
+		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
         sleep(4*60*60);		// Sleep for 4 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }

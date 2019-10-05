@@ -8,6 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys_msg.h>
+#include "common.h"
 
 #define ALLOWANCE_TIMER	30 // take action after 60 second
 WD_RESPONSE_T modulelist[UNKNOWN_MODULE_ID];
@@ -40,6 +41,8 @@ void wdog_main_task()
     }
     register_modules();
 
+	// To prevent system reboot when system clock is not set properly
+	sleep(BARK_DURATION*2);
     while(1) {
     	recv_msg(msgid, (void *) &wd_msg, sizeof(GENERIC_MSG_HEADER_T), 5);
     	wd_msg_handler((GENERIC_MSG_HEADER_T *) &wd_msg);
