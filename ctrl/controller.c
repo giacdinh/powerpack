@@ -166,9 +166,6 @@ host_ping_trial:
 			sleep(2);
 		}		
 		logging(DBG_EVENT, "Sleep 4 hours after data report done\n");
-#ifndef DEV_DEBUG
-		system("sudo shutdown -h now");
-#endif
 
 		// Turn of USB hub to conserv raspi energy in case of battery being used
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
