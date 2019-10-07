@@ -52,6 +52,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 	int readbyte;
 	char *src,*dest;
 	char GPGGA[128];
+	int validate_cnt = 0;
 
 	// Check to see if device node is ready
 	if(access(GPS_SERIAL_DEV, 0) != 0)
@@ -84,7 +85,14 @@ int get_gps_info(NMEA_RMC_T *rmc)
 			if(temp = strstr((char *) &single_sentence, "RMC"))
 			{
 				//printf("%s\n", (char *) &single_sentence);
-				sscanf((char *) &single_sentence,"%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%15[^,],%15[^,]",
+				// Take data after about 30 NMEA sentense to make sure accurate coordination
+				if(validate_cnt < 27)
+				{
+					validate_cnt++;
+				}
+				else
+				{
+					sscanf((char *) &single_sentence,"%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%15[^,],%15[^,]",
 					rmc->gpstype, rmc->gpstime, rmc->gpswarn, rmc->gpslat, rmc->gpslatpos,
 					rmc->gpslong, rmc->gpslongpos, rmc->gpsspeed, rmc->gpscourse, rmc->gpsdate);
 
@@ -104,6 +112,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 
 					close(fd);
 					return 1;
+				}
 			}
 			
 			/* reset space for the next sentence */
