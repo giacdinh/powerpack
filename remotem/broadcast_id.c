@@ -12,7 +12,7 @@
 
 //#define BROADCAST_IP	"255.255.255.255"
 #define BROADCAST_IP	"192.168.1.255" //Broadcast only on internal AP subnet
-#define BROADCAST_PORT	2999
+#define BROADCAST_PORT	1999	 // change to 1999 cause 2999 is remote control
 
 void broadcast_id(char *mess)
 {
