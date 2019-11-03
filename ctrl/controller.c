@@ -88,10 +88,11 @@ void *ctrl_worker_task()
 	{
 		if(usb_init == 1)
 		{
+			usb_init = -1; // Set up if task loop back when GPS is not ready
 			// Turn on USB hub
 			system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/bind");
 			// Wait for 30 second for it to be ready to use
-			sleep(60);
+			sleep(10);
 		}
 		//try to get time from gps and set system time
 		if(-1 == get_gps_info(&rmc))

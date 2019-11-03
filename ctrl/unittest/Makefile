@@ -5,7 +5,7 @@ unittest:
 	gcc -o unittest unittest.c -I../../inc
 
 cloudpost:
-	gcc -o cloudpost cloudpost.c ../../system/get_json_data.c -lcurl -I../../inc \
+	gcc -o cloudpost cloudpost.c ../get_json_data.c -lcurl -I../../inc \
 		../../system/logging.o ../../config/parse_json.o ../../bin/libjson-c.a
 
 deviceID:
@@ -16,3 +16,5 @@ gps:
 
 clean:
 	rm cloudpost deviceID unittest gps
+
+
