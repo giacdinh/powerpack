@@ -8,7 +8,8 @@
 #define CLOUD_ACCEPT        "Accept: application/json"
 //#define MAIN_URL			"http://bacson.tech/endpoint.php/postdata?"
 #define MAIN_URL			"http://bacson.tech/postdata.php/postdata?"
-#define POST_DATA "uid=PP000007&fwv=1.0.2&coord=28.703239,%20-81.204086&temp=42"
+//#define POST_DATA "uid=PP000007&fwv=1.0.2&coord=28.703239,%20-81.204086&temp=42"
+#define POST_DATA "uid=DE000001&fwv=1.0.2&coord=28.703239,%20-81.204086&temp=42"
 
  #define POSTURL 1
  #define ENDPOINT 2
@@ -63,7 +64,7 @@ int main()
 		curl_easy_setopt(curl, CURLOPT_URL, MAIN_URL);
  
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-//	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
