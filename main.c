@@ -7,7 +7,7 @@
 #include <sys/prctl.h>
 #include "build.h"
 
-#define APP_VERSION "1.0.3.3"
+#define APP_VERSION "1.0.3.4"
 extern void *wdog_main_task();
 extern void *remotem_main_task();
 extern void *ctrl_main_task();
