@@ -105,20 +105,22 @@ void remotem_msg_handler(REMOTEM_MSG_T *Incoming)
 
 void *remotem_dog_bark_task()
 {
+#ifdef NOTUSE	// Take out UDP broadcast cause remotem crash
 	int udp_cnt = 0;
 	char unitid[32], *punitID;
 
 	punitID = (char *) &unitid[0];
 	strcpy(punitID,(char *) unit_ID());
-
+#endif
     while(1) 
 	{
 		send_dog_bark(REMOTEM_MODULE_ID);
+#ifdef NOTUSE	// Take out UDP broadcast cause remotem crash
 		if(udp_cnt > 3)
 			broadcast_id(punitID);
 		else
 			udp_cnt++;
-
+#endif
         sleep(BARK_DURATION);
     }
 	return (void *) 0;
