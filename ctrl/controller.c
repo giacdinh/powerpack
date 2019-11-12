@@ -86,14 +86,12 @@ void *ctrl_worker_task()
 
     while(1) 
 	{
-		if(usb_init == 1)
-		{
-			usb_init = -1; // Set up if task loop back when GPS is not ready
-			// Turn on USB hub
-			system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/bind");
-			// Wait for 30 second for it to be ready to use
-			sleep(10);
-		}
+		// Turn on USB hub
+		logging(1,"Turn on USB\n");
+		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/bind");
+		// Wait for 30 second for it to be ready to use
+		sleep(10);
+
 		//try to get time from gps and set system time
 		if(-1 == get_gps_info(&rmc))
 		{
@@ -165,9 +163,9 @@ host_ping_trial:
 		logging(DBG_EVENT, "Sleep 4 hours after data report done\n");
 
 		// Turn of USB hub to conserv raspi energy in case of battery being used
+		logging(1,"Turn off USB\n");
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
-		// make sure to set flag to turn USB back on
-		usb_init = 1;
+	
         sleep(4*60*60);		// Sleep for 4 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
