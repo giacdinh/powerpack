@@ -93,9 +93,10 @@ void *ctrl_worker_task()
 		sleep(10);
 
 		//try to get time from gps and set system time
+		gps_cnt++;
 		if(-1 == get_gps_info(&rmc))
 		{
-			if(gps_cnt++ > 5)
+			if(gps_cnt > 5)
 			{
 				rmc.rlat = 0.000001;
 				rmc.rlong = 0.000001;
@@ -104,6 +105,16 @@ void *ctrl_worker_task()
 				goto use_default_gps;
 			}
 			logging(DBG_ERROR,"%s: Error return, can't get GPS\n", __FUNCTION__);
+			sleep(5);
+			continue;
+		}
+		else if(-2 == get_gps_info(&rmc))
+		{
+			if(gps_cnt > 2) // try to get GPS device mount point couple time
+			{
+				logging(DBG_ERROR,"Force system reboot since no GPS device mount point\n");
+				system("reboot");
+			}
 			sleep(5);
 			continue;
 		}

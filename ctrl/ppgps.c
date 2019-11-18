@@ -58,7 +58,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 	if(access(GPS_SERIAL_DEV, 0) != 0)
 	{
 		logging(DBG_ERROR,"GPS device not existed: %s\n", GPS_SERIAL_DEV);
-		return -1;
+		return -2;
 	}
 		
 	fd = open(GPS_SERIAL_DEV, O_RDWR);
