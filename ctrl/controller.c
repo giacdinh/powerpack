@@ -20,6 +20,7 @@ void *ctrl_worker_task();
 void ctrl_msg_handler(CTRL_MSG_T *Incoming);
 int coord_validate(NMEA_RMC_T *rmc);
 int ping_host();
+int power_source_monitor();
 
 void *ctrl_main_task()
 {
@@ -83,6 +84,8 @@ void *ctrl_worker_task()
 	NMEA_RMC_T rmc;
 	char coord[128];
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
+
+	power_source_monitor();
 
     while(1) 
 	{

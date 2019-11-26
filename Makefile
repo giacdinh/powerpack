@@ -12,7 +12,7 @@ subdirs:
 
 main_app: main.o
 		gcc -o main_app main.o system/system.a remotem/remotem.a ctrl/ctrl.a config/config.a \
-				/usr/local/lib/libjson-c.a -lpthread -lcurl -lssl -lcrypto
+				/usr/local/lib/libjson-c.a -lpthread -lcurl -lssl -lcrypto -lwiringPi
 		rm build.h
 
 timestamp:
