@@ -6,6 +6,8 @@
 // Take the read form GPIO input 21
 // If 1 Device get input from AC power source
 // If 0 Device run on Battery
+int wiringPiSetup();
+int digitalRead();
 
 #define PIN21	21
 int power_source_monitor()

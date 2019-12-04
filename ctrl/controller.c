@@ -95,6 +95,9 @@ void *ctrl_worker_task()
 		// Wait for 30 second for it to be ready to use
 		sleep(10);
 
+		// Clean up coordinate structure holder before each use
+		bzero((void *) &rmc, sizeof(NMEA_RMC_T));
+
 		//try to get time from gps and set system time
 		gps_cnt++;
 		if(-1 == get_gps_info(&rmc))
@@ -165,6 +168,7 @@ host_ping_trial:
 		}
 		else
 		{
+			bzero((void *) &coord[0], 128);
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
 			logging(DBG_EVENT, "coordinate: %s\n", (char *) &coord[0]);
 			postdata((char *) &coord[0]);
@@ -180,7 +184,7 @@ host_ping_trial:
 		logging(1,"Turn off USB\n");
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
 	
-        sleep(4*60*60);		// Sleep for 4 hours
+        sleep(5*60);		// Sleep for 4 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;
