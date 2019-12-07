@@ -83,9 +83,8 @@ void *ctrl_worker_task()
 	static int gps_cnt = 0, ping_cnt = 0;
 	NMEA_RMC_T rmc;
 	char coord[128];
+	static int boot=1, power=0;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
-
-	power_source_monitor();
 
     while(1) 
 	{
@@ -168,10 +167,15 @@ host_ping_trial:
 		}
 		else
 		{
+			// Ready to post, check power source status
+			power = get_power_source();
 			bzero((void *) &coord[0], 128);
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
 			logging(DBG_EVENT, "coordinate: %s\n", (char *) &coord[0]);
-			postdata((char *) &coord[0]);
+			postdata((char *) &coord[0], boot, power);
+			// Check and reset boot status flag
+			if(boot == 1)
+				boot = 0;
 			
 			// disconnect modem and go back to waiting mode
 			logging(DBG_EVENT,"Disconnect cellular\n");
@@ -184,7 +188,7 @@ host_ping_trial:
 		logging(1,"Turn off USB\n");
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
 	
-        sleep(5*60);		// Sleep for 4 hours
+        sleep(4*60*60);		// Sleep for 4 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;
@@ -222,5 +226,4 @@ int ping_host()
 
 	return 1;
 }
-
 

@@ -12,7 +12,7 @@
 
 #define CLOUD_ACCEPT	"Accept: application/json"
 #define DEFAULT_URL		"http://bacson.tech/postdata.php/postdata?"
-#define POST_DATA		"uid=%s&coord=%s&fwv=%s&temp=%s"
+#define POST_DATA		"uid=%s&coord=%s&fwv=%s&temp=%s&boot=%d&pwr=%d"
 
 static int server_connect = 1; //use this flag to toggle between default and config URL
 
@@ -40,7 +40,7 @@ static size_t Cloud_Header_Response(char *buffer, size_t size, size_t nitems, vo
     return nitems;
 }
 
-int postdata(char *coordinate)
+int postdata(char *coordinate, int boot, int power)
 {
     CURL *curl;
     CURLcode res;
@@ -69,7 +69,7 @@ int postdata(char *coordinate)
 	// get core temperature
 	get_core_temp(&coretemp[0]);
 	get_version(&version[0]);
-	sprintf(pdata,POST_DATA,puid,coordinate,&version[0],&coretemp[0]);
+	sprintf(pdata,POST_DATA,puid,coordinate,&version[0],&coretemp[0],boot,power);
     logging(DBG_EVENT,"%s\n", pdata);
 
     /* In windows, this will init the winsock stuff */ 

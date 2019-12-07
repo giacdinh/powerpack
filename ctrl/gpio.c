@@ -9,8 +9,8 @@
 int wiringPiSetup();
 int digitalRead();
 
-#define PIN21	21
-int power_source_monitor()
+#define PIN21	29  // RASPI PIN21 is WIRINGPI PIN29
+int get_power_source()
 {
     int Pin21 = -1;
     logging(DBG_INFO, "%s: Entering ...\n", __FUNCTION__);
