@@ -31,6 +31,7 @@ int get_power_source()
 		logging(1,"Device running on Battery\n");
 		return 0;
 	}
+	return -1;
 }
 
 
