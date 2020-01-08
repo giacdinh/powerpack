@@ -20,3 +20,4 @@ int logging(int level, char *logstr, ...);
 char *sys_dev_id();
 
 #define BARK_DURATION	10
+#define REPORT_DELAY	4	
