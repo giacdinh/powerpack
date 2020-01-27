@@ -103,6 +103,7 @@ int test_hat_power()
 	}
 	else if(rv == 0)
 	{
+		// Read time out, port may be not active
 		return 1;
 	}
 	else

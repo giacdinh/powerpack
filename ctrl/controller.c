@@ -84,15 +84,36 @@ void *ctrl_worker_task()
 	NMEA_RMC_T rmc;
 	char coord[128];
 	static int boot=1, power=0;
+	int hat_pwr_status = 0;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
 
     while(1) 
 	{
+
+#ifndef USE_RASPI_HAT
 		// Turn on USB hub
 		logging(1,"Turn on USB\n");
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/bind");
+#else
+		hat_pwr_status = test_hat_power();
+		if(hat_pwr_status == 1)
+		{
+			logging(1,"Turn on HAT\n");
+			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
+		}
+		else if (hat_pwr_status == -1)
+			logging(DBG_ERROR,"May be something wrong with HAT\n");
+		else if (hat_pwr_status == 0)
+			logging(DBG_INFO,"HAT port may be on, don't turn it on\n");
+		
+#endif
 		// Wait for 30 second for it to be ready to use
 		sleep(10);
+
+#ifndef USE_RASPI_HAT
+#else
+	init_raspi_hat_gps();
+#endif
 
 		// Clean up coordinate structure holder before each use
 		bzero((void *) &rmc, sizeof(NMEA_RMC_T));
@@ -142,14 +163,23 @@ use_default_gps:
 		system("echo fwv=`/usr/local/bin/main_app -v |awk '{print $3}'` > /mnt/sysdata/log/version");
 		// start cellular modem connection
 		logging(DBG_EVENT,"Get cellular connection\n");
+
+#ifndef USE_RASPI_HAT
 		// Make sure PPP session start clean
 		system("sudo hologram network disconnect");
 		sleep(1);
 		system("sudo hologram network connect");
 		sleep(2);
+#else
+		system("sudo pppd call gprs &");
+		sleep(3);
+#endif
+		logging(DBG_EVENT,"Done cellular connection\n");
+
 host_ping_trial:	
 		if(-1 == ping_host() && ping_cnt++ < 3)
 		{
+		logging(DBG_EVENT,"pinging host\n");
 			if(ping_cnt >= 3)
 			{
 				ping_cnt = 0;
@@ -177,17 +207,25 @@ host_ping_trial:
 			if(boot == 1)
 				boot = 0;
 			
+		logging(DBG_EVENT,"done post\n");
 			// disconnect modem and go back to waiting mode
+#ifndef USE_RASPI_HAT
 			logging(DBG_EVENT,"Disconnect cellular\n");
 			system("sudo hologram network disconnect");	
 			sleep(2);
+#endif
 		}		
 		logging(DBG_EVENT, "Sleep 4 hours after data report done\n");
 
+#ifndef USE_RASPI_HAT
 		// Turn of USB hub to conserv raspi energy in case of battery being used
 		logging(1,"Turn off USB\n");
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
-	
+#else
+		logging(1,"Turn off HAT\n");
+		system ("sudo python /usr/local/bin/GSM_PWRKEY.py");
+		sleep(5);
+#endif
         sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
