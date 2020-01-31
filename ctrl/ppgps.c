@@ -5,6 +5,7 @@
 #include <fcntl.h> 
 #include <termios.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 #include "common.h"
 #include "sys_msg.h"
 
@@ -136,6 +137,7 @@ int init_raspi_hat_gps()
     char *cmd[5] = {"AT+CGNSPWR=1\r\n", "AT+CGNSSEQ=\"RMC\"\r\n",
             "AT+CGNSINF\r\n", "AT+CGNSURC=2\r\n","AT+CGNSTST=1\r\n" };
 
+//	logging(1,"Start init raspi hat\n");
 	// Check to see if device node is ready
 	if(access(GPS_SERIAL_DEV, 0) != 0)
 	{
@@ -158,6 +160,7 @@ int init_raspi_hat_gps()
         write(fd, cmd[i], strlen(cmd[i]));
         sleep(1);
     }
+//	logging(1,"Done init raspi hat\n");
 }
 
 
@@ -279,6 +282,7 @@ int test_hat_power()
 	}
 
 	set_serial(fd, B115200);
+	ioctl(fd, TCFLSH, 2); //Flush both of read and write
 
 	// Poking the seria port before read response
 	write(fd, "AT\r\n", 4);
@@ -299,7 +303,8 @@ int test_hat_power()
 	else if(rv == 0)
 	{
 		// Read time out, port may be not active
-		return 1;
+	//	logging(1,"Read timeout.Port OFF\n");
+		return 0;
 	}
 	else
 	{
@@ -307,9 +312,15 @@ int test_hat_power()
 		if(rbyte > 0)
 		{
 			if(strstr(buff,"NORMAL POWER"))
-				return 1;
+			{
+	//			logging(1,"POWER DOWN NORMAL.Port OFF\n");
+				return 0;
+			}
 			else
-				return 0;	
+			{
+	//			logging(1,"Read something %s. Port ON\n", buff);
+				return 1;	
+			}
 		}
 	}	
 }

@@ -98,12 +98,14 @@ int test_hat_power()
 	rv = select(fd + 1, &set, NULL, NULL, &timeout);
 	if(rv == -1)
 	{
+		printf("Read error\n");
 		/* an error accured */
 		return -1;
 	}
 	else if(rv == 0)
 	{
 		// Read time out, port may be not active
+		printf("Read timeout. Port off\n");
 		return 1;
 	}
 	else
@@ -112,9 +114,15 @@ int test_hat_power()
 		if(rbyte > 0)
 		{
 			if(strstr(buff,"NORMAL POWER"))
+			{
+				printf("Read timeout. Port off\n");
 				return 1;
+			}
 			else
+			{
+				printf("Read something. Port on\n");
 				return 0;	
+			}
 		}
 	}	
 }

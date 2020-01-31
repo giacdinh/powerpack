@@ -79,12 +79,12 @@ void *ctrl_dog_bark_task()
 
 void *ctrl_worker_task()
 {
-	static int time_set_init = -1, usb_init = -1;  
+	static int time_set_init = -1, usb_init = -1, netw_issue = 0;  
 	static int gps_cnt = 0, ping_cnt = 0;
 	NMEA_RMC_T rmc;
 	char coord[128];
 	static int boot=1, power=0;
-	int hat_pwr_status = 0;
+	int hat_pwr_status = -1;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
 
     while(1) 
@@ -96,15 +96,16 @@ void *ctrl_worker_task()
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/bind");
 #else
 		hat_pwr_status = test_hat_power();
-		if(hat_pwr_status == 1)
+		//logging(1,"Device with GSM/GPS HAT is %d %s\n",hat_pwr_status, hat_pwr_status==0?"OFF":"ON");
+		if(hat_pwr_status == 0)
 		{
 			logging(1,"Turn on HAT\n");
 			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
 		}
-		else if (hat_pwr_status == -1)
+		else if (hat_pwr_status == 1)
+			logging(DBG_EVENT,"HAT port may be on, don't turn it on\n");
+		else
 			logging(DBG_ERROR,"May be something wrong with HAT\n");
-		else if (hat_pwr_status == 0)
-			logging(DBG_INFO,"HAT port may be on, don't turn it on\n");
 		
 #endif
 		// Wait for 30 second for it to be ready to use
@@ -171,22 +172,38 @@ use_default_gps:
 		system("sudo hologram network connect");
 		sleep(2);
 #else
-		system("sudo pppd call gprs &");
-		sleep(3);
+		logging(DBG_EVENT, "Setup PPP\n");
+		system("sudo pppd call gprs-hologram &");
+		sleep(30);
+		// Setup up add route script and execute
+		logging(DBG_EVENT, "Add route to network\n");
+		system("sudo ip route flush 0/0");
+		sleep(1);
+		system("sudo route add default gw `ifconfig ppp0 |grep inet|cut -c 14-26` ppp0");
+		//system("sudo chmod +x /tmp/addroute.sh");
+		//system("sudo /tmp/addroute.sh");
+		sleep(2);
 #endif
 		logging(DBG_EVENT,"Done cellular connection\n");
 
 host_ping_trial:	
-		if(-1 == ping_host() && ping_cnt++ < 3)
+		//if(-1 == ping_host() && ping_cnt++ < 10)
+		if(-1 == ping_host())
 		{
-		logging(DBG_EVENT,"pinging host\n");
-			if(ping_cnt >= 3)
+			if(ping_cnt++ > 5)
 			{
 				ping_cnt = 0;
 				logging(DBG_ERROR,"Can't connect to host. Skip this post\n");	
+				netw_issue++;
+				if(netw_issue > 2) // If device have 3 skip post reboot
+					system("reboot");
+				else
+					netw_issue++;
 				// disconnect modem and go back to waiting mode
+#ifndef USE_RASPI_HAT
 				system("sudo hologram network disconnect");	
-				sleep(2);
+#else
+#endif
 			}
 			else
 			{
@@ -197,6 +214,7 @@ host_ping_trial:
 		}
 		else
 		{
+			netw_issue = 0; // reset network issue flag
 			// Ready to post, check power source status
 			power = get_power_source();
 			bzero((void *) &coord[0], 128);
@@ -207,7 +225,6 @@ host_ping_trial:
 			if(boot == 1)
 				boot = 0;
 			
-		logging(DBG_EVENT,"done post\n");
 			// disconnect modem and go back to waiting mode
 #ifndef USE_RASPI_HAT
 			logging(DBG_EVENT,"Disconnect cellular\n");
@@ -223,6 +240,7 @@ host_ping_trial:
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
 #else
 		logging(1,"Turn off HAT\n");
+		system ("sudo killall pppd");
 		system ("sudo python /usr/local/bin/GSM_PWRKEY.py");
 		sleep(5);
 #endif
@@ -257,7 +275,8 @@ int coord_validate(NMEA_RMC_T *rmc)
 
 int ping_host()
 {
-	struct hostent *hostinfo;
+	struct hostent *hostinfo = NULL;
+	logging(DBG_EVENT,"pinging host\n");
 	hostinfo = gethostbyname(BACSON_HOST_NAME);
 	if(hostinfo == NULL) // Not connected???
 		return -1;

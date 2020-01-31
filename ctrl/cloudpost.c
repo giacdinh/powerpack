@@ -37,6 +37,7 @@ static size_t Cloud_Header_Response(char *buffer, size_t size, size_t nitems, vo
 			logging(DBG_INFO,"%s\n",buffer);
 		}
     }
+
     return nitems;
 }
 
