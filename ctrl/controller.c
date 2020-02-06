@@ -121,16 +121,17 @@ void *ctrl_worker_task()
 
 		//try to get time from gps and set system time
 		gps_cnt++;
+		if(gps_cnt > 5)
+		{
+			rmc.rlat = 0.000001;
+			rmc.rlong = 0.000001;
+			gps_cnt = 0;
+			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
+			goto use_default_gps;
+		}
+
 		if(-1 == get_gps_info(&rmc))
 		{
-			if(gps_cnt > 5)
-			{
-				rmc.rlat = 0.000001;
-				rmc.rlong = 0.000001;
-				gps_cnt = 0;
-				logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
-				goto use_default_gps;
-			}
 			logging(DBG_ERROR,"%s: Error return, can't get GPS\n", __FUNCTION__);
 			sleep(5);
 			continue;
@@ -147,14 +148,14 @@ void *ctrl_worker_task()
 		}
 		else
 		{
-			gps_cnt = 0;	// Reset when able to get GPS coordinate
-		
 			if(-1 == coord_validate(&rmc))
 			{
-				logging(DBG_ERROR, "Coordinate invalid. Sleep for a minute then loop for more data\n");
+				logging(DBG_ERROR, "Coordinate invalid. Sleep for a minute. GPScnt: %d\n", gps_cnt);
 				sleep(60);
 				continue;
 			}
+			else
+				gps_cnt = 0;    // Reset when able to get GPS coordinate
 		}
 
 use_default_gps:

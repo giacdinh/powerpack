@@ -17,6 +17,9 @@ gps:
 raspihat:
 	gcc -o raspihat hattest.c
 
+hatgps:
+	gcc -o hatgps hatgps.c -I../../inc ../../system/logging.o
+
 clean:
 	rm cloudpost deviceID unittest gps raspihat
 

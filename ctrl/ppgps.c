@@ -160,6 +160,7 @@ int init_raspi_hat_gps()
         write(fd, cmd[i], strlen(cmd[i]));
         sleep(1);
     }
+	return 1;
 //	logging(1,"Done init raspi hat\n");
 }
 
