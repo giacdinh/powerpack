@@ -112,6 +112,11 @@ int get_gps_info(NMEA_RMC_T *rmc)
 					if(!strncmp(rmc->gpslongpos,"W",1))
 						rmc->rlong *= -1;
 
+printf("lat: %f long: %f speed: %f\n", rmc->rlat, rmc->rlong, speed);
+                    if(speed > 1.0000)
+                        continue;
+
+
 					close(fd);
 					return 1;
 			}

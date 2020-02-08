@@ -13,6 +13,20 @@ typedef struct {
     float rlong;
 } NMEA_RMC_T;	
 
+typedef struct {
+    char gpstype[16];
+    char gpstime[16];
+    char gpslat[16];
+    char gpslatpos[4];
+    char gpslong[16];
+    char gpslongpos[4];
+    char gpsfix[4]; //0=invalid,1=GPS,2=DGPS,3=PPS,4=RTK,5=float,6=estimated
+    char gpssat[4]; //number of satellite
+    char gpshoz[8];
+    char gpsalt[16];
+    char gpsaltM[4];
+} NMEA_GGA_T;
+
 #define USE_RASPI_HAT 1
 
 //#define GPS_SERIAL_DEV "/dev/ttyUSB0"

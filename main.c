@@ -6,8 +6,13 @@
 #include <string.h>
 #include <sys/prctl.h>
 #include "build.h"
+#include "common.h"
 
-#define APP_VERSION "1.0.3.6HAT"
+#ifndef USE_RASPI_HAT
+#define APP_VERSION "1.0.3.7"
+#else
+#define APP_VERSION "1.0.3.7HAT"
+#endif
 
 extern void *wdog_main_task();
 extern void *remotem_main_task();

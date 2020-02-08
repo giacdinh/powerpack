@@ -84,7 +84,7 @@ void *ctrl_worker_task()
 	NMEA_RMC_T rmc;
 	char coord[128];
 	static int boot=1, power=0;
-	int hat_pwr_status = -1;
+	int hat_pwr_status = -1, gps_ret = -1;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
 
     while(1) 
@@ -130,13 +130,14 @@ void *ctrl_worker_task()
 			goto use_default_gps;
 		}
 
-		if(-1 == get_gps_info(&rmc))
+		gps_ret = get_gps_info(&rmc);
+		if(gps_ret == -1)
 		{
 			logging(DBG_ERROR,"%s: Error return, can't get GPS\n", __FUNCTION__);
 			sleep(5);
 			continue;
 		}
-		else if(-2 == get_gps_info(&rmc))
+		else if(gps_ret == -2)
 		{
 			if(gps_cnt > 2) // try to get GPS device mount point couple time
 			{
@@ -242,10 +243,10 @@ host_ping_trial:
 #else
 		logging(1,"Turn off HAT\n");
 		system ("sudo killall pppd");
-		system ("sudo python /usr/local/bin/GSM_PWRKEY.py");
+		//system ("sudo python /usr/local/bin/GSM_PWRKEY.py");
 		sleep(5);
 #endif
-        sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
+        sleep(30*60);		// Sleep for 4 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;

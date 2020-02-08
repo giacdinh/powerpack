@@ -172,6 +172,8 @@ int get_gps_info(NMEA_RMC_T *rmc)
 	int readbyte;
 	char *src,*dest;
 	int validate_cnt = 0;
+	NMEA_GGA_T gga;
+	int satnum = 0;
 
 	// Check to see if device node is ready
 	if(access(GPS_SERIAL_DEV, 0) != 0)
@@ -201,37 +203,50 @@ int get_gps_info(NMEA_RMC_T *rmc)
 		{
 			//printf("%s", (char *) &single_sentence);	
 			/* Pass to process to each sentence format */
+			// Check for amount of connected satellite
+			if(temp = strstr((char *) &single_sentence, "GGA"))
+			{
+				sscanf((char *) &single_sentence,"%15[^,],%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%3[^,],%3[^,],%7[^,],%15[^,],%3[^,]",
+			        gga.gpstype, gga.gpstime, gga.gpslat ,gga.gpslatpos,
+			        gga.gpslong, gga.gpslongpos, gga.gpsfix, gga.gpssat,
+			        gga.gpshoz, gga.gpsalt, gga.gpsaltM);
+				satnum = strtol(gga.gpssat, NULL, 10);
+			}
+
 			if(temp = strstr((char *) &single_sentence, "RMC"))
 			{
 				//printf("%s\n", (char *) &single_sentence);
-				// Take data after about 30 NMEA sentense to make sure accurate coordination
-				if(validate_cnt < 27)
-				{
-					validate_cnt++;
-				}
-				else
-				{
-					sscanf((char *) &single_sentence,"%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%15[^,],%15[^,]",
+				sscanf((char *) &single_sentence,"%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%15[^,],%15[^,]",
 					rmc->gpstype, rmc->gpstime, rmc->gpswarn, rmc->gpslat, rmc->gpslatpos,
 					rmc->gpslong, rmc->gpslongpos, rmc->gpsspeed, rmc->gpscourse, rmc->gpsdate);
 
-					float declat, declong;
-					declat = strtof(rmc->gpslat,NULL);
-					declong = strtof(rmc->gpslong,NULL);
+				float declat, declong;
+				declat = strtof(rmc->gpslat,NULL);
+				declong = strtof(rmc->gpslong,NULL);
 
-					float rlat, rlong;
-					rmc->rlat = gpsconvert(declat);
-					rmc->rlong = gpsconvert(declong);
+				float rlat, rlong;
+				rmc->rlat = gpsconvert(declat);
+				rmc->rlong = gpsconvert(declong);
 
-					if(!strncmp(rmc->gpslatpos,"S",1))
-						rmc->rlat *= -1;
+				if(!strncmp(rmc->gpslatpos,"S",1))
+					rmc->rlat *= -1;
 
-					if(!strncmp(rmc->gpslongpos,"W",1))
-						rmc->rlong *= -1;
+				if(!strncmp(rmc->gpslongpos,"W",1))
+					rmc->rlong *= -1;
+				float speed = 0;
+				speed = strtof(rmc->gpsspeed, NULL);
 
-					close(fd);
-					return 1;
-				}
+				logging(DBG_DBG,"%f, %f, warn: %s speed: %f satnum: %d val: %d\n", 
+					rmc->rlat, rmc->rlong, rmc->gpswarn, speed, satnum,validate_cnt);
+
+				if(speed < 0.1000 && satnum > 3)
+				    validate_cnt++;
+				
+				if(speed > 0.1000 || rmc->rlat == 0 || rmc->rlong == 0 || satnum < 4 || validate_cnt < 30)
+					continue;
+
+				close(fd);
+				return 1;
 			}
 			
 			/* reset space for the next sentence */
