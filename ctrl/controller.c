@@ -246,7 +246,7 @@ host_ping_trial:
 		//system ("sudo python /usr/local/bin/GSM_PWRKEY.py");
 		sleep(5);
 #endif
-        sleep(30*60);		// Sleep for 4 hours
+        sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;

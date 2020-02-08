@@ -9,9 +9,9 @@
 #include "common.h"
 
 #ifndef USE_RASPI_HAT
-#define APP_VERSION "1.0.3.7"
+#define APP_VERSION "1.0.3.6"
 #else
-#define APP_VERSION "1.0.3.7HAT"
+#define APP_VERSION "1.0.3.6H"
 #endif
 
 extern void *wdog_main_task();
