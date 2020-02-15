@@ -173,23 +173,25 @@ int get_gps_info(NMEA_RMC_T *rmc)
 	char *src,*dest;
 	int validate_cnt = 0;
 	NMEA_GGA_T gga;
-	int satnum = 0;
+	int satnum = 0, no_signal = 0;
 
 	// Check to see if device node is ready
 	if(access(GPS_SERIAL_DEV, 0) != 0)
 	{
 		logging(DBG_ERROR,"GPS device not existed: %s\n", GPS_SERIAL_DEV);
-		return -2;
+		return GPS_NO_DEV;
 	}
 		
 	fd = open(GPS_SERIAL_DEV, O_RDWR);
 	if( fd < 0)
 	{
 		logging(DBG_ERROR,"Serial port open failed: %s\n", GPS_SERIAL_DEV);
-		return -1;
+		return GPS_NO_PORT;
 	}
 
 	set_serial(fd, B115200);
+
+	ioctl(fd, TCFLSH, 2); //Flush both of read and write
 
 	/* Init read single NMEA string */
 	char single_sentence[128], *temp;
@@ -243,10 +245,15 @@ int get_gps_info(NMEA_RMC_T *rmc)
 				    validate_cnt++;
 				
 				if(speed > 0.1000 || rmc->rlat == 0 || rmc->rlong == 0 || satnum < 4 || validate_cnt < 30)
-					continue;
+				{
+					if(no_signal++ > 1200) // hang around ~20 min for TTFF (time to first fix)
+						return GPS_NO_SAT;
+					else
+						continue;
+				}
 
 				close(fd);
-				return 1;
+				return GPS_DATA;
 			}
 			
 			/* reset space for the next sentence */

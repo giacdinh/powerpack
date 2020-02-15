@@ -131,13 +131,13 @@ void *ctrl_worker_task()
 		}
 
 		gps_ret = get_gps_info(&rmc);
-		if(gps_ret == -1)
+		if(gps_ret == GPS_NO_PORT)
 		{
 			logging(DBG_ERROR,"%s: Error return, can't get GPS\n", __FUNCTION__);
 			sleep(5);
 			continue;
 		}
-		else if(gps_ret == -2)
+		else if(gps_ret == GPS_NO_DEV)
 		{
 			if(gps_cnt > 2) // try to get GPS device mount point couple time
 			{
@@ -146,6 +146,14 @@ void *ctrl_worker_task()
 			}
 			sleep(5);
 			continue;
+		}
+		else if(gps_ret == GPS_NO_SAT) // use default coordinate if no valid one available
+		{
+			rmc.rlat = 0.000001;
+			rmc.rlong = 0.000001;
+			gps_cnt = 0;
+			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
+			goto use_default_gps;
 		}
 		else
 		{

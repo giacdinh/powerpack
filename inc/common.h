@@ -29,6 +29,13 @@ typedef struct {
 
 #define USE_RASPI_HAT 1
 
+typedef enum {
+	GPS_DATA = 0,
+	GPS_NO_PORT,
+	GPS_NO_DEV,
+	GPS_NO_SAT
+} GPS_ERROR_ID; 
+
 //#define GPS_SERIAL_DEV "/dev/ttyUSB0"
 #ifndef USE_RASPI_HAT
 #define GPS_SERIAL_DEV "/dev/ttyACM0" //AMA0
