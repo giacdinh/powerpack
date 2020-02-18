@@ -21,7 +21,7 @@ int get_config_url(char *url);
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-	logging(DBG_INFO,"%s\n", (char *) ptr);
+	logging(1,"%s\n", (char *) ptr);
     return nmemb;
 }
 
@@ -30,7 +30,7 @@ static size_t Cloud_Header_Response(char *buffer, size_t size, size_t nitems, vo
     if(strstr(buffer, "HTTP"))
     {
 		if(strstr(buffer, "200 OK"))
-			logging(DBG_EVENT,"response OK\n");	
+			logging(1,"response OK\n");	
 		else
 		{
 			server_connect = 0;
@@ -101,7 +101,7 @@ int postdata(char *coordinate, int boot, int power)
         /* Check for errors */ 
         if(res != CURLE_OK)
 		{
-            printf("%s:curl_easy_perform() failed: %s\n",
+            logging(DBG_ERROR,"%s:curl_easy_perform() failed: %s\n",
 			__FUNCTION__, curl_easy_strerror(res));
 		}
     /* always cleanup */ 
@@ -157,5 +157,6 @@ int get_config_url(char *url)
 	get_str_json(ENDPOINT,(char *) &endpoint[0]);
 	sprintf(url,"%s%s",&posturl[0],&endpoint[0]);
 
+	logging(DBG_DBG,"%s: URL: %s\n", __FUNCTION__, url);
 	return 0;
 }

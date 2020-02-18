@@ -184,15 +184,13 @@ use_default_gps:
 #else
 		logging(DBG_EVENT, "Setup PPP\n");
 		system("sudo pppd call gprs-hologram &");
-		sleep(30);
+		sleep(20);
 		// Setup up add route script and execute
 		logging(DBG_EVENT, "Add route to network\n");
 		system("sudo ip route flush 0/0");
-		sleep(1);
-		system("sudo route add default gw `ifconfig ppp0 |grep inet|cut -c 14-26` ppp0");
-		//system("sudo chmod +x /tmp/addroute.sh");
-		//system("sudo /tmp/addroute.sh");
 		sleep(2);
+		system("sudo route add default gw `ifconfig ppp0 |grep inet |awk -F ' ' '{print $2}'` ppp0");
+		sleep(18);
 #endif
 		logging(DBG_EVENT,"Done cellular connection\n");
 
@@ -249,7 +247,7 @@ host_ping_trial:
 		logging(1,"Turn off USB\n");
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
 #else
-		logging(1,"Turn off HAT\n");
+		logging(1,"kill HAT pppd session\n");
 		system ("sudo killall pppd");
 		//system ("sudo python /usr/local/bin/GSM_PWRKEY.py");
 		sleep(5);
