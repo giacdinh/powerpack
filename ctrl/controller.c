@@ -190,7 +190,7 @@ use_default_gps:
 		system("sudo ip route flush 0/0");
 		sleep(2);
 		system("sudo route add default gw `ifconfig ppp0 |grep inet |awk -F ' ' '{print $2}'` ppp0");
-		sleep(18);
+		sleep(28);
 #endif
 		logging(DBG_EVENT,"Done cellular connection\n");
 
@@ -249,7 +249,6 @@ host_ping_trial:
 #else
 		logging(1,"kill HAT pppd session\n");
 		system ("sudo killall pppd");
-		//system ("sudo python /usr/local/bin/GSM_PWRKEY.py");
 		sleep(5);
 #endif
         sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours

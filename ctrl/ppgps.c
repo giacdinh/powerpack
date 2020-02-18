@@ -238,7 +238,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 				float speed = 0;
 				speed = strtof(rmc->gpsspeed, NULL);
 
-				logging(DBG_DBG,"%f, %f, warn: %s speed: %f satnum: %d val: %d\n", 
+				logging(DBG_DETAILED,"%f, %f, warn: %s speed: %f satnum: %d val: %d\n", 
 					rmc->rlat, rmc->rlong, rmc->gpswarn, speed, satnum,validate_cnt);
 
 				if(speed < 0.1000 && satnum > 3)
