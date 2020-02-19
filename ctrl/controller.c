@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 #include "common.h"
 #include "ctrl_common.h"
 
@@ -182,15 +183,15 @@ use_default_gps:
 		system("sudo hologram network connect");
 		sleep(2);
 #else
-		logging(DBG_EVENT, "Setup PPP\n");
+		logging(DBG_EVENT, "Setup PPP. Network routing should be handled by PPP\n");
 		system("sudo pppd call gprs-hologram &");
-		sleep(20);
+		sleep(30);
 		// Setup up add route script and execute
-		logging(DBG_EVENT, "Add route to network\n");
-		system("sudo ip route flush 0/0");
-		sleep(2);
-		system("sudo route add default gw `ifconfig ppp0 |grep inet |awk -F ' ' '{print $2}'` ppp0");
-		sleep(28);
+//		logging(DBG_EVENT, "Add route to network\n");
+//		system("sudo ip route flush 0/0");
+//		sleep(2);
+//		system("sudo route add default gw `ifconfig ppp0 |grep inet |awk -F ' ' '{print $2}'` ppp0");
+//		sleep(38);
 #endif
 		logging(DBG_EVENT,"Done cellular connection\n");
 
@@ -228,7 +229,15 @@ host_ping_trial:
 			bzero((void *) &coord[0], 128);
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
 			logging(DBG_EVENT, "coordinate: %s\n", (char *) &coord[0]);
-			postdata((char *) &coord[0], boot, power);
+			int postresult = 0;
+			postresult = postdata((char *) &coord[0], boot, power);
+			if(postresult == -1)
+			{
+				sleep(30);
+				logging(1, "Try to post one more time before give up\n");
+				postresult = postdata((char *) &coord[0], boot, power);
+			}
+	
 			// Check and reset boot status flag
 			if(boot == 1)
 				boot = 0;
@@ -283,10 +292,21 @@ int coord_validate(NMEA_RMC_T *rmc)
 int ping_host()
 {
 	struct hostent *hostinfo = NULL;
-	logging(DBG_EVENT,"pinging host\n");
+	char ip[16];
+	struct sockaddr_in sock_addr;
+	int i;
+
 	hostinfo = gethostbyname(BACSON_HOST_NAME);
 	if(hostinfo == NULL) // Not connected???
+	{
+		logging(DBG_ERROR,"pinging host failed\n");
 		return -1;
+	}
+    for (i = 0; hostinfo->h_addr_list[i]; ++i) {
+        sock_addr.sin_addr = *((struct in_addr*) hostinfo->h_addr_list[i]);
+        inet_ntop(AF_INET, &sock_addr.sin_addr, ip, sizeof(ip));
+        logging(DBG_EVENT,"hostname: %s %s\n",BACSON_HOST_NAME, ip);
+    }
 
 	return 1;
 }

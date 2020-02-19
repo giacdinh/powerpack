@@ -103,6 +103,7 @@ int postdata(char *coordinate, int boot, int power)
 		{
             logging(DBG_ERROR,"%s:curl_easy_perform() failed: %s\n",
 			__FUNCTION__, curl_easy_strerror(res));
+			return -1;
 		}
     /* always cleanup */ 
         curl_easy_cleanup(curl);
