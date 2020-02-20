@@ -37,7 +37,7 @@ int logging(int level, char *logstr, ...)
 
 	// write into logfile
 	int fd;
-	fd = open( (char *) &logfilename , O_RDWR | O_APPEND | O_CREAT, 0644);
+	fd = open( (char *) &logfilename , O_RDWR | O_APPEND | O_CREAT, 0666);
 
 	if(fd < 0)
 	{

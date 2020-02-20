@@ -186,12 +186,7 @@ use_default_gps:
 		logging(DBG_EVENT, "Setup PPP. Network routing should be handled by PPP\n");
 		system("sudo pppd call gprs-hologram &");
 		sleep(30);
-		// Setup up add route script and execute
-//		logging(DBG_EVENT, "Add route to network\n");
-//		system("sudo ip route flush 0/0");
-//		sleep(2);
-//		system("sudo route add default gw `ifconfig ppp0 |grep inet |awk -F ' ' '{print $2}'` ppp0");
-//		sleep(38);
+		system("sudo echo `ifconfig ppp0 |grep inet` >> /mnt/sysdata/log/`date -I |awk -F '-' '{print $1$2$3}'`'_log'");
 #endif
 		logging(DBG_EVENT,"Done cellular connection\n");
 
@@ -258,7 +253,6 @@ host_ping_trial:
 #else
 		logging(1,"kill HAT pppd session\n");
 		system ("sudo killall pppd");
-		sleep(5);
 #endif
         sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
 		logging(DBG_EVENT, "Wakeup to report data\n");
