@@ -81,7 +81,7 @@ void *ctrl_dog_bark_task()
 void *ctrl_worker_task()
 {
 	static int time_set_init = -1, usb_init = -1, netw_issue = 0;  
-	static int gps_cnt = 0, ping_cnt = 0;
+	static int gps_cnt = 0, ping_cnt = 0, shortsleep = 0;
 	NMEA_RMC_T rmc;
 	char coord[128];
 	static int boot=1, power=0;
@@ -196,7 +196,8 @@ host_ping_trial:
 		{
 			if(ping_cnt++ > 5)
 			{
-				ping_cnt = 0;
+				ping_cnt = 0; 
+				shortsleep = 1;  // if can't connect to host, try at shorter wait
 				logging(DBG_ERROR,"Can't connect to host. Skip this post\n");	
 				netw_issue++;
 				if(netw_issue > 2) // If device have 3 skip post reboot
@@ -254,7 +255,14 @@ host_ping_trial:
 		logging(1,"kill HAT pppd session\n");
 		system ("sudo killall pppd");
 #endif
-        sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
+		if(shortsleep == 1)
+		{
+			shortsleep = 0;
+			sleep(60*60);		// Sleep for 1 hours
+		}
+		else
+			sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
+
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;
