@@ -1,8 +1,8 @@
 {
-"unitid":"BS000002",
+"unitid":"BS000009",
 "version":1538234099
 "posturl":"www.bacson.tech",
-"endpoint":"/postdata.php?postdata",
+"endpoint":"/postdata.php/postdata?",
 "homelat":"0.00001",
 "homelong":"0.00001",
 "metric":1
