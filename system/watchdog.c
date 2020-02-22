@@ -111,7 +111,7 @@ void wd_action()
 
 		else if( (lcur_time - modulelist[i].timer) > 180)
 		{
-	        logging(DBG_ERROR, "System about to be reboot\n");
+	        logging(DBG_ERROR, "System about to be reboot because %s\n", modname[modulelist[i].module_id]);
 			system("reboot");
 		}
     }
