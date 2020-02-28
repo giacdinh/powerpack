@@ -56,19 +56,18 @@ int get_gps_info(NMEA_RMC_T *rmc)
 	char *src,*dest;
 	char GPGGA[128];
 	int validate_cnt = 0;
-
 	// Check to see if device node is ready
 	if(access(GPS_SERIAL_DEV, 0) != 0)
 	{
 		logging(DBG_ERROR,"GPS device not existed: %s\n", GPS_SERIAL_DEV);
-		return -2;
+		return GPS_NO_DEV;
 	}
 		
 	fd = open(GPS_SERIAL_DEV, O_RDWR);
 	if( fd < 0)
 	{
 		logging(DBG_ERROR,"Serial port open failed: %s\n", GPS_SERIAL_DEV);
-		return -1;
+		return GPS_NO_PORT;
 	}
 
 	set_serial(fd, B4800);
@@ -114,7 +113,7 @@ int get_gps_info(NMEA_RMC_T *rmc)
 						rmc->rlong *= -1;
 
 					close(fd);
-					return 1;
+					return GPS_DATA;
 				}
 			}
 			
