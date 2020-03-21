@@ -28,6 +28,7 @@ typedef struct {
 } NMEA_GGA_T;
 
 //#define USE_RASPI_HAT 1
+#define USE_EMNIFI	1
 
 typedef enum {
 	GPS_DATA = 0,

@@ -161,7 +161,7 @@ void *ctrl_worker_task()
 			if(-1 == coord_validate(&rmc))
 			{
 				logging(DBG_ERROR, "Coordinate invalid. Sleep for a minute. GPScnt: %d\n", gps_cnt);
-				sleep(60);
+				sleep(30);
 				continue;
 			}
 			else
@@ -184,8 +184,14 @@ use_default_gps:
 		sleep(2);
 #else
 		logging(DBG_EVENT, "Setup PPP. Network routing should be handled by PPP\n");
+	#ifdef USE_EMNIFY
+		logging(DBG_EVENT,"Use Emnify cellular connection\n");
+		system("sudo pppd call gprs-emnify &");
+	#else
+		logging(DBG_EVENT,"Use Hologram cellular connection\n");
 		system("sudo pppd call gprs-hologram &");
-		sleep(30);
+	#endif
+		sleep(20);
 		system("sudo echo `ifconfig ppp0 |grep inet` >> /mnt/sysdata/log/`date -I |awk -F '-' '{print $1$2$3}'`'_log'");
 #endif
 		logging(DBG_EVENT,"Done cellular connection\n");
