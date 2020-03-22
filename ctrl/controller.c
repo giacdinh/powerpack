@@ -260,6 +260,7 @@ host_ping_trial:
 #else
 		logging(1,"kill HAT pppd session\n");
 		system ("sudo killall pppd");
+		system("sudo python /usr/local/bin/GSM_PWRKEY.py");
 #endif
 		if(shortsleep == 1)
 		{
