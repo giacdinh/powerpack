@@ -234,18 +234,13 @@ int get_gps_info(NMEA_RMC_T *rmc)
 
 				if(!strncmp(rmc->gpslongpos,"W",1))
 					rmc->rlong *= -1;
-				float speed = 0;
-				speed = strtof(rmc->gpsspeed, NULL);
 
-				logging(DBG_DETAILED,"%f, %f, warn: %s speed: %f satnum: %d val: %d\n", 
-					rmc->rlat, rmc->rlong, rmc->gpswarn, speed, satnum,validate_cnt);
-
-				if(speed < 0.1000 && satnum > 3)
+				if(satnum > 3)
 				    validate_cnt++;
 				
-				if(speed > 0.1000 || rmc->rlat == 0 || rmc->rlong == 0 || satnum < 4 || validate_cnt < 15)
+				if(rmc->rlat == 0 || rmc->rlong == 0 || satnum < 4 || validate_cnt < 15)
 				{
-					if(no_signal++ > 1200) // hang around ~20 min for TTFF (time to first fix)
+					if(no_signal++ > 120) // hang around ~20 min for TTFF (time to first fix)
 						return GPS_NO_SAT;
 					else
 						continue;
