@@ -119,7 +119,7 @@ void wd_action()
 		else if( (lcur_time - modulelist[i].timer) > 600)
 		{
 			if(log_time_error == 0)
-			logging(DBG_ERROR, "Moudle time: %lu is not current: %lu\n",modulelist[i].timer, lcur_time); 
+			logging(DBG_ERROR, "Module time: %lu is not current: %lu\n",modulelist[i].timer, lcur_time); 
 		}
     }
 }
