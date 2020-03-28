@@ -27,7 +27,7 @@ typedef struct {
     char gpsaltM[4];
 } NMEA_GGA_T;
 
-#define USE_RASPI_HAT 1
+//#define USE_RASPI_HAT 1
 //#define USE_EMNIFY	1
 
 typedef enum {
