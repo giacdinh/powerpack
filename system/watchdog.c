@@ -98,7 +98,7 @@ void wd_action()
 {
     int i;
     unsigned long lcur_time;
-	static int reboot_cnt = 0;
+	static int log_time_error = 0;
     lcur_time = get_sys_cur_time();
     for(i=0; i < UNKNOWN_MODULE_ID; i++)
     {
@@ -110,17 +110,16 @@ void wd_action()
     	else if( ((lcur_time - modulelist[i].timer) > 120) && ((lcur_time - modulelist[i].timer) < 180) )
     		logging(DBG_ERROR, "Module: %s is no longer response...\n", modname[modulelist[i].module_id]);
 
-		else if( (lcur_time - modulelist[i].timer) > 180)
+		else if( (lcur_time - modulelist[i].timer) > 180 && (lcur_time - modulelist[i].timer) < 360 )
 		{
 	        logging(DBG_ERROR, "System about to be reboot because %s mtime: %lu ctime: %lu\n", 
 					modname[modulelist[i].module_id], modulelist[i].timer, lcur_time);
-			reboot_cnt++;	// Because raspi had no clock so a lot of time first boot after long
-							// blackout will cause it reboot
-			if(reboot_cnt > 3)
-				system("reboot");
-			else
-				reboot_cnt++;	// Because raspi had no clock so a lot of time first boot after long
-								// blackout will cause it reboot
+			system("reboot");
+		}
+		else if( (lcur_time - modulelist[i].timer) > 600)
+		{
+			if(log_time_error == 0)
+			logging(DBG_ERROR, "Moudle time: %lu is not current: %lu\n",modulelist[i].timer, lcur_time); 
 		}
     }
 }
