@@ -98,8 +98,25 @@ void wd_action()
 {
     int i;
     unsigned long lcur_time;
-	static int log_time_error = 0;
+	static unsigned long bootime = 0;
     lcur_time = get_sys_cur_time();
+
+	// IF device power off for long time reset the module time to latest
+	// Then if the module stop response it still fall to threshold of 3 min to reboot
+	if(bootime == 0)
+	{
+		logging(1,"%s: set boot time\n",__FUNCTION__);
+		bootime = lcur_time;
+		return;
+	}
+
+	if(lcur_time - bootime > 300 && bootime > 0)
+	{
+		logging(1,"%s: boot time greater than zero but still much smaller than ctime\n");
+		bootime = lcur_time;
+		return;
+	}
+
     for(i=0; i < UNKNOWN_MODULE_ID; i++)
     {
 		// If not response in 60s warning
@@ -110,16 +127,11 @@ void wd_action()
     	else if( ((lcur_time - modulelist[i].timer) > 120) && ((lcur_time - modulelist[i].timer) < 180) )
     		logging(DBG_ERROR, "Module: %s is no longer response...\n", modname[modulelist[i].module_id]);
 
-		else if( (lcur_time - modulelist[i].timer) > 180 && (lcur_time - modulelist[i].timer) < 360 )
+		else if( (lcur_time - modulelist[i].timer) > 180)
 		{
 	        logging(DBG_ERROR, "System about to be reboot because %s mtime: %lu ctime: %lu\n", 
 					modname[modulelist[i].module_id], modulelist[i].timer, lcur_time);
 			system("reboot");
-		}
-		else if( (lcur_time - modulelist[i].timer) > 600)
-		{
-			if(log_time_error == 0)
-			logging(DBG_ERROR, "Module time: %lu is not current: %lu\n",modulelist[i].timer, lcur_time); 
 		}
     }
 }
