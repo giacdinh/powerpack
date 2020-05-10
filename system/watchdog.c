@@ -71,7 +71,7 @@ void wd_msg_handler(GENERIC_MSG_HEADER_T *Incoming)
 
 void UpdateBarkList(int Module)
 {
-    logging(DBG_INFO, "%s: ModID: %d Name: %s\n", __FUNCTION__, Module, modname[Module]);
+    //logging(DBG_INFO, "%s: ModID: %d Name: %s\n", __FUNCTION__, Module, modname[modulelist[i].module_id]);
     int i;
     for(i = 0; i < UNKNOWN_MODULE_ID; i++)
     {

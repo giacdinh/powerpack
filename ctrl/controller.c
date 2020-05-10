@@ -85,6 +85,7 @@ void *ctrl_worker_task()
 	NMEA_RMC_T rmc;
 	char coord[128];
 	static int boot=1, power=0;
+	static int device_reboot = 0;
 	int hat_pwr_status = -1, gps_ret = -1;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
 
@@ -258,9 +259,9 @@ host_ping_trial:
 		logging(1,"Turn off USB\n");
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
 #else
-		logging(1,"kill HAT pppd session\n");
-		system ("sudo killall pppd");
-		system("sudo python /usr/local/bin/GSM_PWRKEY.py");
+//		logging(1,"kill HAT pppd session\n");
+//		system ("sudo killall pppd");
+//		system("sudo python /usr/local/bin/GSM_PWRKEY.py");
 #endif
 		if(shortsleep == 1)
 		{
@@ -268,7 +269,17 @@ host_ping_trial:
 			sleep(60*60);		// Sleep for 1 hours
 		}
 		else
+		{
 			sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
+			device_reboot++;	
+			// If system run for more than 24h, then reboot device
+			// This make sure the system at healthy state all the time
+			if((device_reboot*REPORT_DELAY) > 24)
+			{
+				logging(1,"System periodically reboot\n");
+				system("sudo reboot");
+			}
+		}
 
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
