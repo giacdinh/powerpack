@@ -259,8 +259,8 @@ host_ping_trial:
 		logging(1,"Turn off USB\n");
 		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
 #else
-//		logging(1,"kill HAT pppd session\n");
-//		system ("sudo killall pppd");
+		logging(1,"kill HAT pppd session\n");
+		system ("sudo killall pppd");
 //		system("sudo python /usr/local/bin/GSM_PWRKEY.py");
 #endif
 		if(shortsleep == 1)
