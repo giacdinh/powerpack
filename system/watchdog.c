@@ -103,16 +103,19 @@ void wd_action()
 
 	// IF device power off for long time reset the module time to latest
 	// Then if the module stop response it still fall to threshold of 3 min to reboot
+	// Other than that the system will reboot if other module failed to response
+	// This code put in place because Raspi don't have it own time keeper
+	// And when device connect with PPP, NTP will update the clock and could make device reboot
 	if(bootime == 0)
 	{
-		logging(1,"%s: set boot time\n",__FUNCTION__);
+		logging(DBG_DETAILED,"%s: set boot time\n",__FUNCTION__);
 		bootime = lcur_time;
 		return;
 	}
 
 	if(lcur_time - bootime > 300 && bootime > 0)
 	{
-		logging(1,"boot time greater than zero but still much smaller than ctime\n");
+		logging(DBG_DETAILED,"boot time greater than zero but still much smaller than ctime\n");
 		bootime = lcur_time;
 		return;
 	}
