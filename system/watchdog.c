@@ -112,7 +112,7 @@ void wd_action()
 
 	if(lcur_time - bootime > 300 && bootime > 0)
 	{
-		logging(1,"%s: boot time greater than zero but still much smaller than ctime\n");
+		logging(1,"boot time greater than zero but still much smaller than ctime\n");
 		bootime = lcur_time;
 		return;
 	}
