@@ -185,13 +185,8 @@ use_default_gps:
 		sleep(2);
 #else
 		logging(DBG_EVENT, "Setup PPP. Network routing should be handled by PPP\n");
-	#ifdef USE_EMNIFY
-		logging(DBG_EVENT,"Use Emnify cellular connection\n");
-		system("sudo pppd call gprs-emnify &");
-	#else
 		logging(DBG_EVENT,"Use Hologram cellular connection\n");
 		system("sudo pppd call gprs-hologram &");
-	#endif
 		sleep(20);
 		system("sudo echo `ifconfig ppp0 |grep inet` >> /mnt/sysdata/log/`date -I |awk -F '-' '{print $1$2$3}'`'_log'");
 #endif

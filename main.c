@@ -9,17 +9,9 @@
 #include "common.h"
 
 #ifndef USE_RASPI_HAT
-#ifdef USE_EMNIFY
-#define APP_VERSION "1.0.3.6Em"
+#define APP_VERSION "1.0.3.6"
 #else
 #define APP_VERSION "1.0.3.6Ho"
-#endif
-#else
-#ifdef USE_EMNIFY
-#define APP_VERSION "1.0.3.6HEm"
-#else
-#define APP_VERSION "1.0.3.6HHo"
-#endif
 #endif
 
 extern void *wdog_main_task();
