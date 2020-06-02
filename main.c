@@ -11,7 +11,7 @@
 #ifndef USE_RASPI_HAT
 #define APP_VERSION "1.0.4"
 #else
-#define APP_VERSION "1.0.4Ho"
+#define APP_VERSION "1.0.4H"
 #endif
 
 extern void *wdog_main_task();
