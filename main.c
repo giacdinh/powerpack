@@ -18,6 +18,7 @@ extern void *wdog_main_task();
 extern void *remotem_main_task();
 extern void *ctrl_main_task();
 extern void *conf_main_task();
+extern void *su_main_task();
 
 int main(int argc, char **argv)
 {
@@ -26,6 +27,7 @@ int main(int argc, char **argv)
 	pid_t remotem_pid = -1;
 	pid_t ctrl_pid = -1;
 	pid_t conf_pid = -1;
+	pid_t su_pid = -1;
 
     if(argc > 1)
     {
@@ -96,10 +98,22 @@ int main(int argc, char **argv)
         if(ctrl_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch controller task ID: %i\n", getpid());
-	    prctl(PR_SET_NAME,"main_app_ctrl");
+			prctl(PR_SET_NAME,"main_app_ctrl");
             ctrl_main_task();
         }   
     }	
+
+	// Start software upgrade
+	if(su_pid == -1)
+    {
+        su_pid = fork();
+        if(su_pid == 0) // child process
+        {
+            logging(DBG_DBG, "Launch Software Upgrade task ID: %i\n", getpid());
+			prctl(PR_SET_NAME,"main_app_su");
+            su_main_task();
+        }
+	}
 
 	while(1) {
 		sleep(100); // Main task done after launch children processes
