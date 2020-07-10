@@ -155,6 +155,7 @@ void *ctrl_worker_task()
 			rmc.rlong = 0.000001;
 			gps_cnt = 0;
 			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
+			shortsleep = 1;  // if can't get GPS coordinate, try at shorter wait
 			goto use_default_gps;
 		}
 		else
@@ -261,7 +262,8 @@ host_ping_trial:
 		if(shortsleep == 1)
 		{
 			shortsleep = 0;
-			sleep(60*60);		// Sleep for 1 hours
+			logging(1,"Having issue with last post, do 15m sleep to repost\n");
+			sleep(30*60);		// Sleep for 30m if last post having issue 
 		}
 		else
 		{
