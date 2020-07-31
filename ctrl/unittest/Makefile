@@ -15,12 +15,12 @@ gps:
 	gcc -o gps ppgps.c -I../../inc ../../system/logging.o
 
 raspihat:
-	gcc -o raspihat hattest.c
+	gcc -o raspihat emnify.c -lcurl
 
 hatgps:
 	gcc -o hatgps hatgps.c -I../../inc ../../system/logging.o
 
 clean:
-	rm cloudpost deviceID unittest gps raspihat
+	rm cloudpost deviceID unittest gps raspihat hatgps
 
 
