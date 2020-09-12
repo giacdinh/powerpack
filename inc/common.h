@@ -50,3 +50,4 @@ int test_hat_power();
 
 #define BARK_DURATION	10
 #define REPORT_DELAY	4	
+#define UDP_BC_DEV		"wlan0"

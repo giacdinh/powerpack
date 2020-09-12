@@ -10,30 +10,24 @@
 #include <errno.h>
 #include "common.h"
 
-//#define BROADCAST_IP	"255.255.255.255"
-#define BROADCAST_IP	"192.168.1.255" //Broadcast only on internal AP subnet
 #define BROADCAST_PORT	1999	 // change to 1999 cause 2999 is remote control
 
-void broadcast_id(char *mess)
+void broadcast_id(char *mess, unsigned char *ip)
 {
 	int sock;                        
 	struct sockaddr_in broadcastAddr; 
-	char *broadcastIP;                
 	unsigned short broadcastPort;     
 	char *sendString;                 
 	int broadcastPermission;         
 	int sendStringLen;                
 
-	broadcastIP = BROADCAST_IP;
 	broadcastPort = BROADCAST_PORT;
-
 	sendString = mess;             /*  string to broadcast */
 
 	if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0){
        fprintf(stderr, "socket error");
         exit(1);
 	}
-
 
 	broadcastPermission = 1;
 	if(setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (void *) &broadcastPermission,
@@ -55,7 +49,7 @@ void broadcast_id(char *mess)
 	/* Construct local address structure */
 	memset(&broadcastAddr, 0, sizeof(broadcastAddr));   
 	broadcastAddr.sin_family = AF_INET;                 
-	broadcastAddr.sin_addr.s_addr = inet_addr(broadcastIP);
+	broadcastAddr.sin_addr.s_addr = inet_addr(ip);
 	broadcastAddr.sin_port = htons(broadcastPort);       
 
 	sendStringLen = strlen(sendString);  
