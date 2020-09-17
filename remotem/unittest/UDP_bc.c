@@ -20,9 +20,18 @@
 extern char * unit_ID();
 extern int broadcast_id(char *, unsigned char*);
 int getIP_string(unsigned char *ownIP);
+#define APP_VERSION "1.0.2"
 
-int main()
+int main(int argc, char **argv)
 {
+    if(argc > 1)
+    {
+        if(!strcmp(argv[1], "-v"))
+        {
+            printf("Run version: %s\n", APP_VERSION);
+        }
+        return 0;
+    }
     char unitid[32], *punitID;
 	unsigned char ip[16];
 	punitID = (char *) &unitid[0];	
