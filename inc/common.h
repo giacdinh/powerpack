@@ -68,5 +68,5 @@ int init_raspi_hat_gps();
 int test_hat_power();
 
 #define BARK_DURATION	10
-#define REPORT_DELAY	4	
+#define REPORT_DELAY	6		// Do 6 hours each post, 4 times per day	
 #define UDP_BC_DEV		"wlan0"

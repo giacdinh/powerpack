@@ -100,7 +100,7 @@ void *ctrl_dog_bark_task()
 void *ctrl_worker_task()
 {
 	static int time_set_init = -1, usb_init = -1, netw_issue = 0;  
-	static int gps_cnt = 0, ping_cnt = 0, shortsleep = 0;
+	static int gps_cnt = 0, ping_cnt = 0, shortsleep = -1;
 	NMEA_RMC_T rmc;
 	char coord[128];
 	static int boot=1, power=0;
@@ -174,7 +174,8 @@ void *ctrl_worker_task()
 			rmc.rlong = 0.000001;
 			gps_cnt = 0;
 			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
-			shortsleep = 1;  // if can't get GPS coordinate, try at shorter wait
+			if(shortsleep == -1) // only set short sleep once
+				shortsleep = 1;  // if can't get GPS coordinate, try at shorter wait
 			goto use_default_gps;
 		}
 		else
@@ -219,7 +220,8 @@ host_ping_trial:
 			if(ping_cnt++ > 5)
 			{
 				ping_cnt = 0; 
-				shortsleep = 1;  // if can't connect to host, try at shorter wait
+				if(shortsleep == -1) // only set short sleep once
+					shortsleep = 1;  // if can't connect to host, try at shorter wait
 				logging(DBG_ERROR,"Can't connect to host. Skip this post\n");	
 				netw_issue++;
 				if(netw_issue > 2) // If device have 3 skip post reboot
@@ -280,7 +282,7 @@ host_ping_trial:
 #endif
 		if(shortsleep == 1)
 		{
-			shortsleep = 0;
+			shortsleep = 0; // Put flag on disable state
 			logging(1,"Having issue with last post, do 15m sleep to repost\n");
 			sleep(30*60);		// Sleep for 30m if last post having issue 
 		}
