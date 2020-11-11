@@ -16,7 +16,7 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Bac Son Technologies LLC.
  */
-
+#include <wiringPi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "common.h"
@@ -29,6 +29,7 @@ int wiringPiSetup();
 int digitalRead();
 
 #define PIN21	29  // RASPI PIN21 is WIRINGPI PIN29
+#define PIN26	25  // RASPI PIN26 is WIRINGPI PIN25
 int get_power_source()
 {
     int Pin21 = -1;
@@ -51,6 +52,20 @@ int get_power_source()
 		return 0;
 	}
 	return -1;
+}
+int set_gpio_pin26()
+{
+    int Pin26 = -1;
+    printf("%s: Entering ...\n", __FUNCTION__);
+ 
+    /* Init GPIO ports */
+    if( 0 > wiringPiSetup())
+        printf("Failed to init GPIO lib\n");
+        
+    pinMode(PIN26, OUTPUT);
+    digitalWrite(PIN26, HIGH);
+
+    return 1;
 }
 
 
