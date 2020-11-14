@@ -29,7 +29,7 @@ int wiringPiSetup();
 int digitalRead();
 
 #define PIN21	29  // RASPI PIN21 is WIRINGPI PIN29
-#define PIN26	25  // RASPI PIN26 is WIRINGPI PIN25
+#define PIN16	27  // RASPI PIN16 is WIRINGPI PIN27
 int get_power_source()
 {
     int Pin21 = -1;
@@ -53,17 +53,16 @@ int get_power_source()
 	}
 	return -1;
 }
-int set_gpio_pin26()
+int set_gpio_pin16()
 {
-    int Pin26 = -1;
     printf("%s: Entering ...\n", __FUNCTION__);
  
     /* Init GPIO ports */
     if( 0 > wiringPiSetup())
         printf("Failed to init GPIO lib\n");
         
-    pinMode(PIN26, OUTPUT);
-    digitalWrite(PIN26, HIGH);
+    pinMode(PIN16, OUTPUT);
+    digitalWrite(PIN16, HIGH);
 
     return 1;
 }
