@@ -53,7 +53,7 @@ int get_power_source()
 	}
 	return -1;
 }
-int set_gpio_pin16()
+int set_gpio_pin16_high()
 {
     printf("%s: Entering ...\n", __FUNCTION__);
  

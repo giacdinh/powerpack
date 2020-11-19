@@ -46,8 +46,6 @@ typedef struct {
     char gpsaltM[4];
 } NMEA_GGA_T;
 
-#define USE_RASPI_HAT 1
-
 typedef enum {
 	GPS_DATA = 0,
 	GPS_NO_PORT,
@@ -56,11 +54,7 @@ typedef enum {
 } GPS_ERROR_ID; 
 
 //#define GPS_SERIAL_DEV "/dev/ttyUSB0"
-#ifndef USE_RASPI_HAT
-#define GPS_SERIAL_DEV "/dev/ttyACM0" //AMA0
-#else
 #define GPS_SERIAL_DEV "/dev/ttyS0" //AMA0
-#endif
 int get_gps_info(NMEA_RMC_T *rmc);
 int logging(int level, char *logstr, ...);
 char *sys_dev_id();
@@ -69,4 +63,5 @@ int test_hat_power();
 
 #define BARK_DURATION	10
 #define REPORT_DELAY	6		// Do 6 hours each post, 4 times per day	
+#define PERIODIC_REBOOT 48		// Force system reboot every 2 days to keep software in sync
 #define UDP_BC_DEV		"wlan0"

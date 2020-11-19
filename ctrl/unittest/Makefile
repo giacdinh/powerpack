@@ -1,5 +1,5 @@
 
-all: unittest deviceID gps cloudpost raspihat
+all: unittest deviceID gps cloudpost raspihat getpin setpin
 
 unittest:
 	gcc -o unittest unittest.c -I../../inc
@@ -20,7 +20,13 @@ raspihat:
 hatgps:
 	gcc -o hatgps hatgps.c -I../../inc ../../system/logging.o
 
+getpin:
+	gcc -o getpin getpin.c -lwiringPi 
+
+setpin:
+	gcc -o setpin setpin.c -lwiringPi 
+
 clean:
-	rm cloudpost deviceID unittest gps raspihat hatgps
+	rm cloudpost deviceID unittest gps raspihat hatgps getpin setpin
 
 

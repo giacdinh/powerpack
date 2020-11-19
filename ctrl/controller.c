@@ -110,12 +110,6 @@ void *ctrl_worker_task()
 
     while(1) 
 	{
-
-#ifndef USE_RASPI_HAT
-		// Turn on USB hub
-		logging(1,"Turn on USB\n");
-		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/bind");
-#else
 		hat_pwr_status = test_hat_power();
 		//logging(1,"Device with GSM/GPS HAT is %d %s\n",hat_pwr_status, hat_pwr_status==0?"OFF":"ON");
 		if(hat_pwr_status == 0)
@@ -128,14 +122,10 @@ void *ctrl_worker_task()
 		else
 			logging(DBG_ERROR,"May be something wrong with HAT\n");
 		
-#endif
 		// Wait for 30 second for it to be ready to use
 		sleep(10);
 
-#ifndef USE_RASPI_HAT
-#else
 	init_raspi_hat_gps();
-#endif
 
 		// Clean up coordinate structure holder before each use
 		bzero((void *) &rmc, sizeof(NMEA_RMC_T));
@@ -198,19 +188,11 @@ use_default_gps:
 		// start cellular modem connection
 		logging(DBG_EVENT,"Get cellular connection\n");
 
-#ifndef USE_RASPI_HAT
-		// Make sure PPP session start clean
-		system("sudo hologram network disconnect");
-		sleep(1);
-		system("sudo hologram network connect");
-		sleep(2);
-#else
 		logging(DBG_EVENT, "Setup PPP. Network routing should be handled by PPP\n");
 		logging(DBG_EVENT,"Use Hologram cellular connection\n");
 		system("sudo pppd call gprs-hologram &");
 		sleep(20);
 		system("sudo echo `ifconfig ppp0 |grep inet` >> /mnt/sysdata/log/`date -I |awk -F '-' '{print $1$2$3}'`'_log'");
-#endif
 		logging(DBG_EVENT,"Done cellular connection\n");
 
 host_ping_trial:	
@@ -228,11 +210,6 @@ host_ping_trial:
 					system("reboot");
 				else
 					netw_issue++;
-				// disconnect modem and go back to waiting mode
-#ifndef USE_RASPI_HAT
-				system("sudo hologram network disconnect");	
-#else
-#endif
 			}
 			else
 			{
@@ -263,36 +240,33 @@ host_ping_trial:
 				boot = 0;
 			
 			// disconnect modem and go back to waiting mode
-#ifndef USE_RASPI_HAT
-			logging(DBG_EVENT,"Disconnect cellular\n");
-			system("sudo hologram network disconnect");	
-			sleep(2);
-#endif
 		}		
-		logging(DBG_EVENT, "Sleep 4 hours after data report done\n");
 
-#ifndef USE_RASPI_HAT
-		// Turn of USB hub to conserv raspi energy in case of battery being used
-		logging(1,"Turn off USB\n");
-		system("sudo echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
-#else
 		logging(1,"kill HAT pppd session\n");
 		system ("sudo killall pppd");
-//		system("sudo python /usr/local/bin/GSM_PWRKEY.py");
-#endif
+		system("sudo python /usr/local/bin/GSM_PWRKEY.py");
+
 		if(shortsleep == 1)
 		{
 			shortsleep = 0; // Put flag on disable state
-			logging(1,"Having issue with last post, do 15m sleep to repost\n");
+			logging(1,"Having issue with last post, do 30m sleep to repost\n");
 			sleep(30*60);		// Sleep for 30m if last post having issue 
 		}
 		else
 		{
+			if(power == 0) // Run from battery, will flag controller to shutdown power
+			{
+				logging(1,"System run on battery. Let controller shutdown to conserve power\n");
+				sync();
+				set_gpio_pin16_high();
+			}
+
+			logging(DBG_EVENT, "Sleep %d hours after data report done\n", REPORT_DELAY);
 			sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
 			device_reboot++;	
-			// If system run for more than 24h, then reboot device
+			// If system run for more than 48h, then reboot device
 			// This make sure the system at healthy state all the time
-			if((device_reboot*REPORT_DELAY) > 24)
+			if((device_reboot*REPORT_DELAY) > PERIODIC_REBOOT)
 			{
 				logging(1,"System periodically reboot\n");
 				system("sudo reboot");

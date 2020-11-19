@@ -66,89 +66,6 @@ int set_serial(int fd, int speed)
 }
 
 
-#ifndef USE_RASPI_HAT
-int get_gps_info(NMEA_RMC_T *rmc)
-{
-	int fd, i;
-	char read_buf[1024];
-	int readbyte;
-	char *src,*dest;
-	char GPGGA[128];
-	int validate_cnt = 0;
-	// Check to see if device node is ready
-	if(access(GPS_SERIAL_DEV, 0) != 0)
-	{
-		logging(DBG_ERROR,"GPS device not existed: %s\n", GPS_SERIAL_DEV);
-		return GPS_NO_DEV;
-	}
-		
-	fd = open(GPS_SERIAL_DEV, O_RDWR);
-	if( fd < 0)
-	{
-		logging(DBG_ERROR,"Serial port open failed: %s\n", GPS_SERIAL_DEV);
-		return GPS_NO_PORT;
-	}
-
-	set_serial(fd, B4800);
-
-	/* Init read single NMEA string */
-	char single_sentence[128], *temp;
-	temp = (char *) &single_sentence;
-	bzero(temp,128);
-
-	while(1)
-	{
-		read(fd,temp,1);
-		if(*temp == '\n')
-		{
-			//printf("%s", (char *) &single_sentence);	
-			/* Pass to process to each sentence format */
-			if(temp = strstr((char *) &single_sentence, "RMC"))
-			{
-				//printf("%s\n", (char *) &single_sentence);
-				// Take data after about 30 NMEA sentense to make sure accurate coordination
-				if(validate_cnt < 27)
-				{
-					validate_cnt++;
-				}
-				else
-				{
-					sscanf((char *) &single_sentence,"%15[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%3[^,],%15[^,],%15[^,],%15[^,]",
-					rmc->gpstype, rmc->gpstime, rmc->gpswarn, rmc->gpslat, rmc->gpslatpos,
-					rmc->gpslong, rmc->gpslongpos, rmc->gpsspeed, rmc->gpscourse, rmc->gpsdate);
-
-					float declat, declong;
-					declat = strtof(rmc->gpslat,NULL);
-					declong = strtof(rmc->gpslong,NULL);
-
-					float rlat, rlong;
-					rmc->rlat = gpsconvert(declat);
-					rmc->rlong = gpsconvert(declong);
-
-					if(!strncmp(rmc->gpslatpos,"S",1))
-						rmc->rlat *= -1;
-
-					if(!strncmp(rmc->gpslongpos,"W",1))
-						rmc->rlong *= -1;
-
-					close(fd);
-					return GPS_DATA;
-				}
-			}
-			
-			/* reset space for the next sentence */
-			temp = (char *) &single_sentence;
-			bzero(temp,128);
-			usleep(5000); // Sleep 5 mils 
-		}
-		else
-			temp++;
-	}
-	close(fd);
-	return 0;
-}
-
-#else
 int init_raspi_hat_gps()
 {
 	int fd, i;
@@ -280,7 +197,6 @@ int get_gps_info(NMEA_RMC_T *rmc)
 	close(fd);
 	return 0;
 }
-#endif // IFNDEF USE_RASPI_HAT
 
 
 float gpsconvert(float value)

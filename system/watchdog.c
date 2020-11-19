@@ -149,6 +149,11 @@ void wd_action()
     	else if( ((lcur_time - modulelist[i].timer) > 120) && ((lcur_time - modulelist[i].timer) < 180) )
     		logging(DBG_ERROR, "Module: %s is no longer response...\n", modname[modulelist[i].module_id]);
 
+		else if( (lcur_time - modulelist[i].timer) > (60*60*24))
+		{
+	        logging(DBG_ERROR, "System just start, RTC had yet set. Invalid time stamp\n"); 
+			return;
+		}
 		else if( (lcur_time - modulelist[i].timer) > 180)
 		{
 	        logging(DBG_ERROR, "System about to be reboot because %s mtime: %lu ctime: %lu\n", 

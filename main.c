@@ -27,11 +27,7 @@
 #include "build.h"
 #include "common.h"
 
-#ifndef USE_RASPI_HAT
-#define APP_VERSION "1.0.4"
-#else
-#define APP_VERSION "1.0.4H"
-#endif
+#define APP_VERSION "1.0.4.1"
 
 extern void *wdog_main_task();
 extern void *remotem_main_task();
@@ -56,17 +52,6 @@ int main(int argc, char **argv)
         }
         return 0;
     }
-
-#ifndef USE_RASPI_HAT
-	sleep(5);
-
-	// Start cell network connection to git time
-	system("sudo hologram network disconnect");
-	sleep(1);
-	system("sudo hologram network connect");
-	sleep(15); // Make sure ntp doing it job
-	system("sudo hologram network disconnect");
-#endif
 
 	logging(DBG_DBG, "\n");
 	logging(DBG_DBG, "\n");
