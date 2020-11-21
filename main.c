@@ -66,7 +66,7 @@ int main(int argc, char **argv)
         if(wdog_pid == 0) // child process
         {
             logging(DBG_INFO, "Launch watchdog task ID: %i\n", getpid());
-			prctl(PR_SET_NAME,"main_app_wd");
+			prctl(PR_SET_NAME,"powerpack_wd");
             wdog_main_task();
         }
     }
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
         if(remotem_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch remotem task ID: %i\n", getpid());
-			prctl(PR_SET_NAME,"main_app_rm");
+			prctl(PR_SET_NAME,"powerpack_rm");
             remotem_main_task();
         }
     }
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
         if(conf_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch config task ID: %i\n", getpid());
-			prctl(PR_SET_NAME,"main_app_conf");
+			prctl(PR_SET_NAME,"powerpack_conf");
             conf_main_task();
         }
 	} 
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
         if(ctrl_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch controller task ID: %i\n", getpid());
-			prctl(PR_SET_NAME,"main_app_ctrl");
+			prctl(PR_SET_NAME,"powerpack_ctrl");
             ctrl_main_task();
         }   
     }	
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
         if(su_pid == 0) // child process
         {
             logging(DBG_DBG, "Launch Software Upgrade task ID: %i\n", getpid());
-			prctl(PR_SET_NAME,"main_app_su");
+			prctl(PR_SET_NAME,"powerpack_su");
             su_main_task();
         }
 	}
