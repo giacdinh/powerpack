@@ -88,7 +88,7 @@ typedef enum {
 
 typedef struct {
     unsigned int module_id;
-    int     timer;
+    long     timer;
     int     reboot;
 } WD_RESPONSE_T;
 

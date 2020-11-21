@@ -26,6 +26,9 @@
 #include <sys/time.h>
 #include <string.h>
 #include <unistd.h>
+#include <linux/unistd.h>       /* for _syscallX macros/related stuff */
+#include <linux/kernel.h>       /* for struct sysinfo */
+#include <sys/sysinfo.h>
 #include <sys_msg.h>
 #include "common.h"
 
@@ -48,6 +51,18 @@ unsigned long get_sys_cur_time()
     gettimeofday(&sysTime, &tz);
     return sysTime.tv_sec;
 }
+
+long get_uptime()
+{
+    struct sysinfo s_info;
+    int error = sysinfo(&s_info);
+    if(error != 0)
+    {
+        logging(1, "code error = %d\n", error);
+    }
+    return s_info.uptime;
+}
+
 
 void wdog_main_task()
 {
@@ -96,7 +111,7 @@ void UpdateBarkList(int Module)
     {
     	if(modulelist[i].module_id == Module)
     	{
-    		modulelist[i].timer = get_sys_cur_time();
+    		modulelist[i].timer = get_uptime();
 			break;
     	}
     }
@@ -108,7 +123,7 @@ void register_modules()
     for(i=0; i < UNKNOWN_MODULE_ID; i++)
     {
        	modulelist[i].module_id = i;
-        modulelist[i].timer = get_sys_cur_time();
+        modulelist[i].timer = get_uptime();
         modulelist[i].reboot = 0;
     }
 }
@@ -118,26 +133,7 @@ void wd_action()
     int i;
     unsigned long lcur_time;
 	static unsigned long bootime = 0;
-    lcur_time = get_sys_cur_time();
-
-	// IF device power off for long time reset the module time to latest
-	// Then if the module stop response it still fall to threshold of 3 min to reboot
-	// Other than that the system will reboot if other module failed to response
-	// This code put in place because Raspi don't have it own time keeper
-	// And when device connect with PPP, NTP will update the clock and could make device reboot
-	if(bootime == 0)
-	{
-		logging(DBG_DETAILED,"%s: set boot time\n",__FUNCTION__);
-		bootime = lcur_time;
-		return;
-	}
-
-	if(lcur_time - bootime > 300 && bootime > 0)
-	{
-		logging(DBG_DETAILED,"boot time greater than zero but still much smaller than ctime\n");
-		bootime = lcur_time;
-		return;
-	}
+    lcur_time = get_uptime();
 
     for(i=0; i < UNKNOWN_MODULE_ID; i++)
     {
@@ -149,11 +145,6 @@ void wd_action()
     	else if( ((lcur_time - modulelist[i].timer) > 120) && ((lcur_time - modulelist[i].timer) < 180) )
     		logging(DBG_ERROR, "Module: %s is no longer response...\n", modname[modulelist[i].module_id]);
 
-		else if( (lcur_time - modulelist[i].timer) > (60*60*24))
-		{
-	        logging(DBG_ERROR, "System just start, RTC had yet set. Invalid time stamp\n"); 
-			return;
-		}
 		else if( (lcur_time - modulelist[i].timer) > 180)
 		{
 	        logging(DBG_ERROR, "System about to be reboot because %s mtime: %lu ctime: %lu\n", 
