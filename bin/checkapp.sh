@@ -1,2 +1,2 @@
 #!/bin/bash
-ps -A |grep main
+ps -A |grep powerpack
