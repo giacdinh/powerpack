@@ -100,7 +100,7 @@ void *ctrl_dog_bark_task()
 void *ctrl_worker_task()
 {
 	static int time_set_init = -1, usb_init = -1, netw_issue = 0;  
-	static int gps_cnt = 0, ping_cnt = 0, shortsleep = -1;
+	static int gps_cnt = 0, ping_cnt = 0;
 	NMEA_RMC_T rmc;
 	char coord[128];
 	static int boot=1, power=0;
@@ -123,9 +123,9 @@ void *ctrl_worker_task()
 			logging(DBG_ERROR,"May be something wrong with HAT\n");
 		
 		// Wait for 30 second for it to be ready to use
-		sleep(10);
+		sleep(5);
 
-	init_raspi_hat_gps();
+		init_raspi_hat_gps();
 
 		// Clean up coordinate structure holder before each use
 		bzero((void *) &rmc, sizeof(NMEA_RMC_T));
@@ -164,8 +164,6 @@ void *ctrl_worker_task()
 			rmc.rlong = 0.000001;
 			gps_cnt = 0;
 			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
-			if(shortsleep == -1) // only set short sleep once
-				shortsleep = 1;  // if can't get GPS coordinate, try at shorter wait
 			goto use_default_gps;
 		}
 		else
@@ -186,10 +184,9 @@ use_default_gps:
 		sleep(1);
 		system("echo fwv=`/usr/local/bin/main_app -v |awk '{print $3}'` > /mnt/sysdata/log/version");
 		// start cellular modem connection
-		logging(DBG_EVENT,"Get cellular connection\n");
-
-		logging(DBG_EVENT, "Setup PPP. Network routing should be handled by PPP\n");
-		logging(DBG_EVENT,"Use Hologram cellular connection\n");
+		logging(DBG_DBG,"Get cellular connection\n");
+		logging(DBG_DBG, "Setup PPP. Network routing should be handled by PPP\n");
+		logging(DBG_DBG,"Use Hologram cellular connection\n");
 		system("sudo pppd call gprs-hologram &");
 		sleep(20);
 		system("sudo echo `ifconfig ppp0 |grep inet` >> /mnt/sysdata/log/`date -I |awk -F '-' '{print $1$2$3}'`'_log'");
@@ -202,8 +199,6 @@ host_ping_trial:
 			if(ping_cnt++ > 5)
 			{
 				ping_cnt = 0; 
-				if(shortsleep == -1) // only set short sleep once
-					shortsleep = 1;  // if can't connect to host, try at shorter wait
 				logging(DBG_ERROR,"Can't connect to host. Skip this post\n");	
 				netw_issue++;
 				if(netw_issue > 2) // If device have 3 skip post reboot
@@ -235,31 +230,24 @@ host_ping_trial:
 				postresult = postdata((char *) &coord[0], boot, power);
 			}
 	
-			// Check and reset boot status flag
-			if(boot == 1)
+			if(boot == 1)	// Reset 
 				boot = 0;
-			
-			// disconnect modem and go back to waiting mode
 		}		
 
-		logging(1,"kill HAT pppd session\n");
-		system ("sudo killall pppd");
-		system("sudo python /usr/local/bin/GSM_PWRKEY.py");
-
-		if(shortsleep == 1)
+		if(power == 0) // Run from battery, will flag controller to shutdown power
 		{
-			shortsleep = 0; // Put flag on disable state
-			logging(1,"Having issue with last post, do 30m sleep to repost\n");
-			sleep(30*60);		// Sleep for 30m if last post having issue 
+			logging(1,"System run on battery. Let controller shutdown to conserve power\n");
+			sync();
+			sleep(1);	// Ready after sync
+			set_gpio_pin16_high();
+			sleep(5);	// Power control management will shutdown the RASPI
 		}
-		else
+
+		else	// If run on AC just sleep and wake up after REPORT DELAY timer 
 		{
-			if(power == 0) // Run from battery, will flag controller to shutdown power
-			{
-				logging(1,"System run on battery. Let controller shutdown to conserve power\n");
-				sync();
-				set_gpio_pin16_high();
-			}
+			logging(1,"kill HAT pppd session\n");
+			system ("sudo killall pppd");
+			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
 
 			logging(DBG_EVENT, "Sleep %d hours after data report done\n", REPORT_DELAY);
 			sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
@@ -272,7 +260,6 @@ host_ping_trial:
 				system("sudo reboot");
 			}
 		}
-
 		logging(DBG_EVENT, "Wakeup to report data\n");
     }
 	return (void *) 0;

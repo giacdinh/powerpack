@@ -72,7 +72,6 @@ int main(int argc, char **argv)
     }
 
 	// Start remote
-
 	if(remotem_pid == -1)
     {
         remotem_pid = fork();
@@ -84,6 +83,7 @@ int main(int argc, char **argv)
         }
     }
 
+	// Start config
 	if(conf_pid == -1)
     {
         conf_pid = fork();
