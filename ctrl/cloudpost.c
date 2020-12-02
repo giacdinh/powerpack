@@ -30,7 +30,8 @@
 #include "dev_config.h"
 
 #define CLOUD_ACCEPT	"Accept: application/json"
-#define DEFAULT_URL		"http://bacsontech.com/postdata.php/postdata?"
+#define DEFAULT_URL		"http://bacson.tech/postdata.php/postdata?"
+#define BACKUP_URL		"http://bacsontech.com/postdata.php/postdata?"
 #define POST_DATA		"uid=%s&coord=%s&fwv=%s&temp=%s&boot=%d&pwr=%d"
 
 static int server_connect = 1; //use this flag to toggle between default and config URL
@@ -125,12 +126,21 @@ int postdata(char *coordinate, int boot, int power)
         
 			curl_easy_setopt(curl, CURLOPT_URL, DEFAULT_URL);
 			if(res != CURLE_OK)
+			{
 				logging(DBG_ERROR,"%s: Repost use DEFAULT_URL curl_easy_perform() failed: %s\n",
 					__FUNCTION__, curl_easy_strerror(res));
-			
-			curl_easy_cleanup(curl);
-			curl_global_cleanup();
-			return -1;
+
+				curl_easy_setopt(curl, CURLOPT_URL, BACKUP_URL);
+				if(res != CURLE_OK)
+				{
+					logging(DBG_ERROR,"%s: Repost use BACKUP_URL curl_easy_perform() failed: %s\n",
+						__FUNCTION__, curl_easy_strerror(res));
+					// All attempt failed, clean up and return error
+					curl_easy_cleanup(curl);
+					curl_global_cleanup();
+					return -1;
+				}
+			}
 		}
     /* always cleanup */ 
         curl_easy_cleanup(curl);
