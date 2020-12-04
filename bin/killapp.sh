@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo killall main_app main_app_wd main_app_rm main_app_ctrl main_app_conf
+sudo killall powerpack powerpack_wd powerpack_rm powerpack_ctrl powerpack_conf powerpack_su
