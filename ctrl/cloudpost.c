@@ -29,6 +29,12 @@
 #include "sys_msg.h"
 #include "dev_config.h"
 
+#ifdef UNIT_DEBUG
+#define DBG_CTRL  1
+#else
+#define DBG_CTRL  10
+#endif
+
 #define CLOUD_ACCEPT	"Accept: application/json"
 #define DEFAULT_URL		"http://bacson.tech/postdata.php/postdata?"
 #define BACKUP_URL		"http://bacsontech.com/postdata.php/postdata?"
@@ -195,6 +201,6 @@ int get_config_url(char *url)
 	get_str_json(ENDPOINT,(char *) &endpoint[0]);
 	sprintf(url,"%s%s",&posturl[0],&endpoint[0]);
 
-	logging(DBG_DBG,"%s: URL: %s\n", __FUNCTION__, url);
+	logging(DBG_CTRL,"%s: URL: %s\n", __FUNCTION__, url);
 	return 0;
 }

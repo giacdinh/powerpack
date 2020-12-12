@@ -157,7 +157,7 @@ void *remotem_com_task()
         logging(DBG_ERROR, "%s %d: Failed to create socket \n", __FUNCTION__, __LINE__);
     }
 
-    logging(DBG_DBG, "%s %d: looping for remote connect sock: %d\n", __FUNCTION__, __LINE__, remotem_socketId);
+    logging(DBG_REM, "%s %d: looping for remote connect sock: %d\n", __FUNCTION__, __LINE__, remotem_socketId);
     if((listen(remotem_socketId, REMOTEM_BACKLOG)) < 0)
     {
         if (errno != EINTR)

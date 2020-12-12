@@ -94,7 +94,7 @@ void *conf_main_task()
 void *config_dog_bark_task()
 {
 	// config start well ahead of most module bark need to wait
-	logging(1,"%s: Entering\n", __FUNCTION__);
+	logging(DBG_CONFIG,"%s: Entering\n", __FUNCTION__);
 	sleep(7);
     while(1) {
         send_dog_bark(CONFIG_MODULE_ID);
@@ -155,7 +155,7 @@ int config_init()
 					break;
 				case POSTURL:
 					strncpy(config.posturl, process_json_data((char *) &confbuf[0], CONFIG_FIELD[POSTURL], 0),MAX_CONFIG_SZ);
-                    logging(DBG_CONFIG, "posturl: %s\n", config.posturl);
+                    logging(1, "posturl: %s\n", config.posturl);
 					break;
 				case ENDPOINT:
 					strncpy(config.endpoint, process_json_data((char *) &confbuf[0], CONFIG_FIELD[ENDPOINT], 0),MAX_CONFIG_SZ);

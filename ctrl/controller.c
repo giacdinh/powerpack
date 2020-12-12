@@ -184,9 +184,9 @@ use_default_gps:
 		sleep(1);
 		system("echo fwv=`/usr/local/bin/main_app -v |awk '{print $3}'` > /mnt/sysdata/log/version");
 		// start cellular modem connection
-		logging(DBG_DBG,"Get cellular connection\n");
-		logging(DBG_DBG, "Setup PPP. Network routing should be handled by PPP\n");
-		logging(DBG_DBG,"Use Hologram cellular connection\n");
+		logging(DBG_CTRL,"Get cellular connection\n");
+		logging(DBG_CTRL, "Setup PPP. Network routing should be handled by PPP\n");
+		logging(DBG_CTRL,"Use Hologram cellular connection\n");
 		system("sudo pppd call gprs-hologram &");
 		sleep(20);
 		system("sudo echo `ifconfig ppp0 |grep inet` >> /mnt/sysdata/log/`date -I |awk -F '-' '{print $1$2$3}'`'_log'");
@@ -220,7 +220,7 @@ host_ping_trial:
 			power = get_power_source();
 			bzero((void *) &coord[0], 128);
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
-			logging(DBG_EVENT, "coordinate: %s\n", (char *) &coord[0]);
+			logging(DBG_CTRL, "coordinate: %s\n", (char *) &coord[0]);
 			int postresult = 0;
 			postresult = postdata((char *) &coord[0], boot, power);
 			if(postresult == -1)
