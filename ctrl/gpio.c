@@ -55,11 +55,9 @@ int get_power_source()
 }
 int set_gpio_pin16_high()
 {
-    printf("%s: Entering ...\n", __FUNCTION__);
- 
     /* Init GPIO ports */
     if( 0 > wiringPiSetup())
-        printf("Failed to init GPIO lib\n");
+        logging(DBG_ERROR,"Failed to init GPIO lib\n");
         
     pinMode(PIN16, OUTPUT);
     digitalWrite(PIN16, HIGH);
@@ -67,5 +65,15 @@ int set_gpio_pin16_high()
     return 1;
 }
 
+int set_gpio_pin16_reset()
+{
+    /* Init GPIO ports */
+    if( 0 > wiringPiSetup())
+        logging(DBG_ERROR,"Failed to init GPIO lib\n");
+        
+    pinMode(PIN16, INPUT);
+
+    return 1;
+}
 
 	

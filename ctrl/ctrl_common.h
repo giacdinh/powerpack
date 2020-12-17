@@ -23,4 +23,5 @@ int get_core_temp(char *);
 int get_version(char *);
 int get_power_source();
 int set_gpio_pin16_high();
+int set_gpio_pin16_reset();
 #define BACSON_HOST_NAME "trackingde.tech"

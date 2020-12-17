@@ -182,7 +182,7 @@ use_default_gps:
 		// get core temperature 
 		system("sudo /opt/vc/bin/vcgencmd measure_temp > /mnt/sysdata/log/core_temp");
 		sleep(1);
-		system("echo fwv=`/usr/local/bin/main_app -v |awk '{print $3}'` > /mnt/sysdata/log/version");
+		system("echo fwv=`/usr/local/bin/powerpack -v |awk '{print $3}'` > /mnt/sysdata/log/version");
 		// start cellular modem connection
 		logging(DBG_CTRL,"Get cellular connection\n");
 		logging(DBG_CTRL, "Setup PPP. Network routing should be handled by PPP\n");
@@ -241,6 +241,8 @@ host_ping_trial:
 			sleep(1);	// Ready after sync
 			set_gpio_pin16_high();
 			sleep(5);	// Power control management will shutdown the RASPI
+			set_gpio_pin16_reset(); // Reset pin
+			sleep(1000); // Hang there because of control board will shutdown
 		}
 
 		else	// If run on AC just sleep and wake up after REPORT DELAY timer 

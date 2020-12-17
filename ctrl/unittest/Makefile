@@ -20,6 +20,9 @@ raspihat:
 hatgps:
 	gcc -o hatgps hatgps.c -I../../inc ../../system/logging.o
 
+hattest:
+	gcc -o hattest hattest.c -I../../inc ../../system/logging.o
+
 getpin:
 	gcc -o getpin getpin.c -lwiringPi 
 
