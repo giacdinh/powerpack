@@ -52,7 +52,7 @@ unsigned long get_sys_cur_time()
     return sysTime.tv_sec;
 }
 
-long get_uptime()
+unsigned long get_uptime()
 {
     struct sysinfo s_info;
     int error = sysinfo(&s_info);
@@ -134,6 +134,8 @@ void wd_action()
     unsigned long lcur_time;
 	static unsigned long bootime = 0;
     lcur_time = get_uptime();
+
+	return;
 
     for(i=0; i < UNKNOWN_MODULE_ID; i++)
     {
