@@ -10,7 +10,8 @@
 
 #define SERIAL_DEV "/dev/ttyS0"
 #define AT_CMD		"AT\r\n"
-#define AT_FPLMN		"AT+CRSM=176,28539,0,0,12\r\n"
+#define AT_FPLMN	"AT+CRSM=176,28539,0,0,12\r\n"
+#define AT_CLRFPLMN	"AT+crsm=214,28539,0,0,12,\"FFFFFFFFFFFFFFFFFFFFFFFF\"\r\r"
 
 int set_serial(int fd, int speed)
 {
