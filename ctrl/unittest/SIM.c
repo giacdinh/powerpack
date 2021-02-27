@@ -8,10 +8,11 @@
 #include <sys/ioctl.h>
 
 
-#define SERIAL_DEV "/dev/ttyS0"
+#define SERIAL_DEV	"/dev/ttyS0"
 #define AT_CMD		"AT\r\n"
 #define AT_FPLMN	"AT+CRSM=176,28539,0,0,12\r\n"
 #define AT_CLRFPLMN	"AT+crsm=214,28539,0,0,12,\"FFFFFFFFFFFFFFFFFFFFFFFF\"\r\r"
+#define CLEAN_FPLMN	"FFFFFFFFFFFFFFFFFFFFFFFF"
 
 int set_serial(int fd, int speed)
 {
@@ -53,7 +54,7 @@ int set_serial(int fd, int speed)
 
 int main()
 {
-	char readbuf[128];
+	char readbuf[128], FPLMN[32];
 	int rbyte=0, fd=-1 ;
     if(access(SERIAL_DEV, 0) != 0)
     {
@@ -77,14 +78,35 @@ int main()
 	write(fd, AT_CMD, strlen(AT_CMD));
 	sleep(1);
 	rbyte = read(fd, &readbuf[0], 128);
-	if(rbyte > 0)
-		printf("Read %d: %s\n",rbyte, &readbuf[0]);
 
 	// try FPLMN
 	write(fd, AT_FPLMN, strlen(AT_FPLMN));
 	sleep(1);
 	rbyte = read(fd, &readbuf[0], 128);
-	if(rbyte > 0)
-		printf("Read %d: %s\n",rbyte, &readbuf[0]);
-	close(fd);	
+
+	char *ptemp;
+	ptemp = strstr(&readbuf[0],"\"");
+	ptemp++;
+	sscanf(ptemp, "%[^\"]s", &FPLMN[0]);
+
+	printf("FPLMN: %s\n", &FPLMN[0]);
+	if(0 == strncmp(CLEAN_FPLMN, &FPLMN[0], 24))
+	{
+		printf("FPLMN is clean\n");
+	}
+	else
+	{
+		printf("FPLMN is not clean\n");
+		// try to clear FPLMN
+		write(fd, AT_CLRFPLMN, strlen(AT_CLRFPLMN));
+		sleep(2);
+		// Try to read back FPLMN
+		write(fd, AT_FPLMN, strlen(AT_FPLMN));
+		sleep(1);
+		bzero(&readbuf[0], 128);
+		rbyte = read(fd, &readbuf[0], 128);
+		printf("%s\n", &readbuf[0]);
+	}
+	close(fd);
+	return 1;
 }
