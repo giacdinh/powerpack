@@ -242,6 +242,7 @@ host_ping_trial:
 			set_gpio_pin16_high();
 			sleep(5);	// Power control management will shutdown the RASPI
 			set_gpio_pin16_reset(); // Reset pin
+			system ("sudo killall pppd");
 			sleep(1000); // Hang there because of control board will shutdown
 		}
 
@@ -249,7 +250,7 @@ host_ping_trial:
 		{
 			logging(1,"kill HAT pppd session\n");
 			system ("sudo killall pppd");
-			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
+			//system("sudo python /usr/local/bin/GSM_PWRKEY.py");
 
 			logging(DBG_EVENT, "Sleep %d hours after data report done\n", REPORT_DELAY);
 			sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
