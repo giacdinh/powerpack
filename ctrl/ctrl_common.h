@@ -25,3 +25,6 @@ int get_power_source();
 int set_gpio_pin16_high();
 int set_gpio_pin16_reset();
 #define BACSON_HOST_NAME "trackingde.tech"
+#define POPHOST1 "google.com"
+#define POPHOST2 "www.yahoo.com"
+#define PING_TIME	(2)

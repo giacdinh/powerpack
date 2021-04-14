@@ -196,7 +196,7 @@ host_ping_trial:
 		//if(-1 == ping_host() && ping_cnt++ < 10)
 		if(-1 == ping_host())
 		{
-			if(ping_cnt++ > 5)
+			if(ping_cnt++ > PING_TIME)
 			{
 				ping_cnt = 0; 
 				logging(DBG_ERROR,"Can't connect to host. Skip this post\n");	
@@ -301,8 +301,14 @@ int ping_host()
 	hostinfo = gethostbyname(BACSON_HOST_NAME);
 	if(hostinfo == NULL) // Not connected???
 	{
-		logging(DBG_ERROR,"pinging host failed\n");
-		return -1;
+		//If dedicate host not found try to double check ping popular host. Ex google.com
+		logging(DBG_ERROR,"pinging host failed trying second popular host\n");
+		hostinfo = gethostbyname(POPHOST1);
+		if(hostinfo == NULL)
+		{
+			logging(DBG_ERROR,"pinging host failed\n");
+			return -1;
+		}
 	}
     for (i = 0; hostinfo->h_addr_list[i]; ++i) {
         sock_addr.sin_addr = *((struct in_addr*) hostinfo->h_addr_list[i]);
