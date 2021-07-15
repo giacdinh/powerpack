@@ -25,6 +25,11 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdarg.h>
+#include <unistd.h>
 #include "common.h"
 #include "sys_msg.h"
 
@@ -32,6 +37,20 @@
 
 float gpsconvert(float value);
 int send_gps_AT_cmd(int fd);
+
+int logging(int level, char *logstr, ...)
+{
+    int logbuf[128];
+
+    bzero((char *) &logbuf[0], 128);
+    va_list vl;
+    va_start(vl, logstr);
+    vsprintf((char *) &logbuf[0], logstr, vl);
+    va_end(vl);
+
+    printf("%s", (char *) &logbuf[0]);
+
+}
 
 int set_serial(int fd, int speed)
 {

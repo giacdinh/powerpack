@@ -108,9 +108,11 @@ void *ctrl_worker_task()
 	int hat_pwr_status = -1, gps_ret = -1;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
 
+	// Get all hardware status before stating the handle loop
+	hat_pwr_status = test_hat_power();
+	power = get_power_source();
     while(1) 
 	{
-		hat_pwr_status = test_hat_power();
 		//logging(1,"Device with GSM/GPS HAT is %d %s\n",hat_pwr_status, hat_pwr_status==0?"OFF":"ON");
 		if(hat_pwr_status == 0)
 		{
@@ -140,6 +142,10 @@ void *ctrl_worker_task()
 			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
 			goto use_default_gps;
 		}
+		
+		// If run on DC (battery) try to load GPS EPO file for faster fix
+		if(power == 0)
+			set_gps_epo();
 
 		gps_ret = get_gps_info(&rmc);
 		if(gps_ret == GPS_NO_PORT)
@@ -217,7 +223,6 @@ host_ping_trial:
 		{
 			netw_issue = 0; // reset network issue flag
 			// Ready to post, check power source status
-			power = get_power_source();
 			bzero((void *) &coord[0], 128);
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
 			logging(DBG_CTRL, "coordinate: %s\n", (char *) &coord[0]);
