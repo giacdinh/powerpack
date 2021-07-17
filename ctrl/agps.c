@@ -24,8 +24,10 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <time.h>
 #include <sys/ioctl.h>
 #include "common.h"
+#include "ctrl_common.h"
 #include "sys_msg.h"
 
 int set_gps_epo()

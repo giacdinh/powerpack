@@ -24,7 +24,12 @@ int get_version(char *);
 int get_power_source();
 int set_gpio_pin16_high();
 int set_gpio_pin16_reset();
+int check_gps_epo_load_date();
+int set_serial(int fd, int speed);
+int set_gps_epo();
+int get_gps_info(NMEA_RMC_T *rmc);
 #define BACSON_HOST_NAME "trackingde.tech"
 #define POPHOST1 "google.com"
 #define POPHOST2 "www.yahoo.com"
 #define PING_TIME	(2)
+#define GPS_SERIAL_DEV "/dev/ttyS0" //AMA0

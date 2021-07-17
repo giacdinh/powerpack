@@ -108,12 +108,13 @@ void *ctrl_worker_task()
 	int hat_pwr_status = -1, gps_ret = -1;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
 
-	// Get all hardware status before stating the handle loop
-	hat_pwr_status = test_hat_power();
-	power = get_power_source();
     while(1) 
 	{
 		//logging(1,"Device with GSM/GPS HAT is %d %s\n",hat_pwr_status, hat_pwr_status==0?"OFF":"ON");
+		// HAT power need to be checked every time before turn ON/OFF
+		hat_pwr_status = test_hat_power();
+		power = get_power_source();
+
 		if(hat_pwr_status == 0)
 		{
 			logging(1,"Turn on HAT\n");
@@ -144,8 +145,13 @@ void *ctrl_worker_task()
 		}
 		
 		// If run on DC (battery) try to load GPS EPO file for faster fix
-		if(power == 0)
+		if(1 == check_gps_epo_load_date())
+		{
+			logging(DBG_EVENT,"GPS EPO need to be reloaded\n");
 			set_gps_epo();
+		}
+		else
+			logging(DBG_EVENT,"GPS EPO still valid don't need to reload\n");
 
 		gps_ret = get_gps_info(&rmc);
 		if(gps_ret == GPS_NO_PORT)
@@ -248,7 +254,9 @@ host_ping_trial:
 			sleep(5);	// Power control management will shutdown the RASPI
 			set_gpio_pin16_reset(); // Reset pin
 			system ("sudo killall pppd");
-			sleep(1000); // Hang there because of control board will shutdown
+			logging(DBG_ERROR,"Thing shouldn't be getting here\n");
+			// If it getting here just do normal report
+			sleep(REPORT_DELAY*60*60); // Hang there because of control board will shutdown
 		}
 
 		else	// If run on AC just sleep and wake up after REPORT DELAY timer 
