@@ -174,10 +174,12 @@ int get_gps_info(NMEA_RMC_T *rmc)
 
 				if(satnum > 3)
 				    validate_cnt++;
+				else
+					no_signal++;
 				
-				if(rmc->rlat == 0 || rmc->rlong == 0 || satnum < 4 || validate_cnt < 15)
+				if(validate_cnt < 15)
 				{
-					if(no_signal++ > 600) // hang around ~10 min for TTFF (time to first fix)
+					if(no_signal > 180) // hang around ~3 min for TTFF (time to first fix)
 						return GPS_NO_SAT;
 					else
 						continue;
