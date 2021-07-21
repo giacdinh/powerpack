@@ -92,6 +92,7 @@ int set_gps_epo()
 
 		printf("CMD#: %d -- %s",i, &rbuf[0]);
 	}
+	system("touch /home/bacson/EPO_FLAG");
 }
 
 int check_gps_epo_load_date()
@@ -103,8 +104,21 @@ int check_gps_epo_load_date()
 	if(local->tm_mday%5 == 0)
 	{
 		logging(1, "Date of the month: %d\n", local->tm_mday);
+
+		if(access(EPO_FLAG_FILE, 0) == 0)
+		{
+			logging(DBG_EVENT,"On the same day GPS EPO already loaded.\n");
+			return 0;
+		}
 		return 1;
 	}
 	else
+	{
+		if(access(EPO_FLAG_FILE, 0) == 0)
+		{
+			logging(DBG_EVENT,"EPO_FLAG existed do the remove.\n");
+			system("rm /home/bacson/EPO_FLAG");
+		}
 		return 0;
+	}
 }

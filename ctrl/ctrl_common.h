@@ -33,3 +33,4 @@ int get_gps_info(NMEA_RMC_T *rmc);
 #define POPHOST2 "www.yahoo.com"
 #define PING_TIME	(2)
 #define GPS_SERIAL_DEV "/dev/ttyS0" //AMA0
+#define EPO_FLAG_FILE "/home/bacson/EPO_FLAG"
