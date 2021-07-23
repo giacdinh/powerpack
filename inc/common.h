@@ -57,6 +57,7 @@ int logging(int level, char *logstr, ...);
 char *sys_dev_id();
 int init_raspi_hat_gps();
 int test_hat_power();
+unsigned long get_uptime();
 
 #define BARK_DURATION	10
 #define REPORT_DELAY	6		// Do 6 hours each post, 4 times per day	

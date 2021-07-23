@@ -106,6 +106,7 @@ void *ctrl_worker_task()
 	static int boot=1, power=0;
 	static int device_reboot = 0;
 	int hat_pwr_status = -1, gps_ret = -1;
+	unsigned long gpsstart, gpsend;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
 
     while(1) 
@@ -143,7 +144,7 @@ void *ctrl_worker_task()
 			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
 			goto use_default_gps;
 		}
-		
+		gpsstart = get_uptime();	
 		// If run on DC (battery) try to load GPS EPO file for faster fix
 		if(1 == check_gps_epo_load_date())
 		{
@@ -191,6 +192,8 @@ void *ctrl_worker_task()
 		}
 
 use_default_gps:
+		gpsend = get_uptime();	
+		logging(1, "GPS start: %lu end: %lu total: %lu\n", gpsstart, gpsend, (gpsend-gpsstart));
 		// get core temperature 
 		system("sudo /opt/vc/bin/vcgencmd measure_temp > /mnt/sysdata/log/core_temp");
 		sleep(1);
