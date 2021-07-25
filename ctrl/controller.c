@@ -236,12 +236,12 @@ host_ping_trial:
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
 			logging(DBG_CTRL, "coordinate: %s\n", (char *) &coord[0]);
 			int postresult = 0;
-			postresult = postdata((char *) &coord[0], boot, power,(gpsend-gpstart));
+			postresult = postdata((char *) &coord[0], boot, power,(gpsend-gpsstart));
 			if(postresult == -1)
 			{
 				sleep(30);
 				logging(1, "Try to post one more time before give up\n");
-				postresult = postdata((char *) &coord[0], boot, power);
+				postresult = postdata((char *) &coord[0], boot, power, (gpsend-gpsstart));
 			}
 	
 			if(boot == 1)	// Reset 
