@@ -236,7 +236,7 @@ host_ping_trial:
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
 			logging(DBG_CTRL, "coordinate: %s\n", (char *) &coord[0]);
 			int postresult = 0;
-			postresult = postdata((char *) &coord[0], boot, power);
+			postresult = postdata((char *) &coord[0], boot, power,(gpsend-gpstart));
 			if(postresult == -1)
 			{
 				sleep(30);
