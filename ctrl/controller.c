@@ -146,7 +146,7 @@ void *ctrl_worker_task()
 		}
 		gpsstart = get_uptime();	
 		// If run on DC (battery) try to load GPS EPO file for faster fix
-		if(1 == check_gps_epo_load_date())
+		if(1 == check_gps_epo_load_date() || 1 == GPS_EPO_nocoord_check())
 		{
 			logging(DBG_EVENT,"GPS EPO need to be reloaded\n");
 			set_gps_epo();
@@ -177,6 +177,8 @@ void *ctrl_worker_task()
 			rmc.rlong = 0.000001;
 			gps_cnt = 0;
 			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
+			// Generate GPS EPO load flag for next time
+			GPS_EPO_nocoord_flag(1);
 			goto use_default_gps;
 		}
 		else

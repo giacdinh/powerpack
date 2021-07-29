@@ -28,6 +28,9 @@ int check_gps_epo_load_date();
 int set_serial(int fd, int speed);
 int set_gps_epo();
 int get_gps_info(NMEA_RMC_T *rmc);
+int GPS_EPO_nocoord_flag(int);
+int remove_GPS_EPO_nocoord_flag();
+int GPS_EPO_nocoord_check();
 #define BACSON_HOST_NAME "trackingde.tech"
 #define POPHOST1 "google.com"
 #define POPHOST2 "www.yahoo.com"

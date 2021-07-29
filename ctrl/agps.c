@@ -93,6 +93,8 @@ int set_gps_epo()
 		printf("CMD#: %d -- %s",i, &rbuf[0]);
 	}
 	system("touch /home/bacson/EPO_FLAG");
+	// After done update GPS EPO generate flag
+	remove_GPS_EPO_nocoord_flag();
 }
 
 int check_gps_epo_load_date()
