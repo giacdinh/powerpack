@@ -190,7 +190,11 @@ void *ctrl_worker_task()
 				continue;
 			}
 			else
+			{
 				gps_cnt = 0;    // Reset when able to get GPS coordinate
+				// Got good coordinate, remove the bad GPS coordinate flat
+				remove_GPS_EPO_nocoord_flag();
+			}
 		}
 
 use_default_gps:

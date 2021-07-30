@@ -39,9 +39,8 @@
 
 
 #define GPS_EPO_FLAG	"/mnt/sysdata/data/gps_epo"
-#define DONOT_LOAD_EPO		1
-#define LOAD_EPO			2	
-#define UPDATE_EPO_FLAG		3	
+#define DONOT_LOAD_EPO		0	
+#define LOAD_EPO			1	
 #define LREADBYTE			32
 
 int GPS_EPO_flag(int );
@@ -76,12 +75,10 @@ int GPS_EPO_nocoord_check()
 				logging(DBG_ERROR,"GPS EPO scan with error: %d\n", errno);
 				return -1;
 			}
-			printf("date:%d load:%d\n", date, load);	
 			if(date != local->tm_mday)
 			{
 				// Load GPS EPO 
-				logging(DBG_CTRL,"GPS EPO loading needed\n");
-				GPS_EPO_nocoord_flag(0);
+				logging(DBG_CTRL,"%s: GPS EPO date diff loading needed\n",__FUNCTION__);
 				return 1;
 			}
 			else if (date == local->tm_mday)
@@ -90,12 +87,14 @@ int GPS_EPO_nocoord_check()
 				if(load == 1)
 				{
 					// Load GPS EPO and turn 
-					GPS_EPO_nocoord_flag(0);
-					logging(DBG_CTRL,"GPS EPO loading needed\n");
+					logging(DBG_CTRL,"%s: GPS EPO loading needed\n", __FUNCTION__);
 					return 1;
 				}
-				else	// GPS EPO already loaded 
+				else	// GPS EPO already loaded for that day 
+				{
+					logging(DBG_CTRL,"%s: GPS EPO no load\n", __FUNCTION__);
 					return 0;
+				}
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 
-CFLAGS=-I../inc #-DUNIT_DEBUG=1
+CFLAGS=-I../inc -DUNIT_DEBUG=1
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
