@@ -145,15 +145,6 @@ void *ctrl_worker_task()
 			goto use_default_gps;
 		}
 		gpsstart = get_uptime();	
-		// If run on DC (battery) try to load GPS EPO file for faster fix
-		if(1 == check_gps_epo_load_date() || 1 == GPS_EPO_nocoord_check())
-		{
-			logging(DBG_EVENT,"GPS EPO need to be reloaded\n");
-			set_gps_epo();
-		}
-		else
-			logging(DBG_EVENT,"GPS EPO still valid don't need to reload\n");
-
 		gps_ret = get_gps_info(&rmc);
 		if(gps_ret == GPS_NO_PORT)
 		{
@@ -192,8 +183,6 @@ void *ctrl_worker_task()
 			else
 			{
 				gps_cnt = 0;    // Reset when able to get GPS coordinate
-				// Got good coordinate, remove the bad GPS coordinate flat
-				remove_GPS_EPO_nocoord_flag();
 			}
 		}
 
