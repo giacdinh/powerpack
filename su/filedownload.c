@@ -25,6 +25,7 @@
 
 #define BV_FAILURE (-1)
 #define BV_SUCCESS (1)
+#define FW_FILE "fw.tar.gz"
 
 static int upload_bytes = 0;
 static int FileDownload_ret = BV_FAILURE;
@@ -50,18 +51,18 @@ static size_t FileDownload_Header_Response(char *buffer, size_t size, size_t nit
     return nitems;
 }
  
-int get_su_file(char *filename)
+int get_su_file(char *url_download)
 {
     CURL *curl;
     CURLcode res;
     FILE *download;
 
-    download = fopen(filename, "wb+");
+    download = fopen(FW_FILE, "wb+");
     /* get a curl handle */ 
     curl = curl_easy_init();
     if(curl) {
 		//curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-		curl_easy_setopt(curl, CURLOPT_URL, "www.trackingde.tech/download/main_app");
+		curl_easy_setopt(curl, CURLOPT_URL, url_download);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, FileDownload_writecallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, download);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);

@@ -29,7 +29,7 @@
 #include "dev_config.h"
 
 #define CLOUD_ACCEPT	"Accept: application/json"
-#define POST_DATA		"uid=%s&fwv=%s"
+#define POST_FW_INFO		"%s/swupgrade.php?uid=%s&fwv=%s"
 
 extern int get_version(char *);
 
@@ -49,13 +49,14 @@ static size_t Cloud_Header_Response(char *buffer, size_t size, size_t nitems, vo
 		else
 		{
 			logging(DBG_INFO,"%s\n",buffer);
+			logging(1,"%s\n",buffer);
 		}
     }
 
     return nitems;
 }
 
-int postdata(char *coordinate, int boot, int power)
+int post_fw_info(char *coordinate, int boot, int power)
 {
     CURL *curl;
     CURLcode res;
@@ -74,8 +75,10 @@ int postdata(char *coordinate, int boot, int power)
 		strncpy(puid, (char *) unit_ID(),32);
 	}
 	
+	get_str_json(POSTURL,(char *) &configURL[0]);
 	get_version(&version[0]);
-	sprintf(pdata,POST_DATA,puid,&version[0]);
+	//sprintf(pdata,POST_DATA,puid,&version[0]);
+	sprintf(pdata,POST_FW_INFO,(char *) &configURL[0],puid,&version[0]);
     logging(DBG_EVENT,"%s\n", pdata);
 
     /* In windows, this will init the winsock stuff */ 
