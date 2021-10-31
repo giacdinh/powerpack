@@ -37,7 +37,7 @@ extern int get_version(char *);
 /* Set test Gobal value. At final release this s */
 static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-	logging(1,"%s\n", (char *) ptr);
+	printf("%s\n", (char *) ptr);
     return nmemb;
 }
 
@@ -46,26 +46,25 @@ static size_t Cloud_Header_Response(char *buffer, size_t size, size_t nitems, vo
     if(strstr(buffer, "HTTP"))
     {
 		if(strstr(buffer, "200 OK"))
-			logging(1,"response OK\n");	
+			printf("response OK\n");	
 		else
 		{
-			logging(DBG_INFO,"%s\n",buffer);
-			logging(1,"%s\n",buffer);
-			get_su_file(buffer);
+		//	printf("%s\n",buffer);
 		}
     }
 
     return nitems;
 }
 
-int post_fw_info(char *coordinate, int boot, int power)
+//int post_fw_info(char *coordinate, int boot, int power)
+int main()
 {
     CURL *curl;
     CURLcode res;
     struct curl_slist *headers = NULL;
 	char datafield[128], *pdata;
-	char url[128], *pURL;
 	static char uid[32], *puid = NULL;
+	char url[64], *pURL;
 	char coretemp[16];
 	char version[16];
 	char configURL[512];
@@ -78,13 +77,14 @@ int post_fw_info(char *coordinate, int boot, int power)
 		puid = (char *) &uid[0];
 		strncpy(puid, (char *) unit_ID(),32);
 	}
-	
-	get_str_json(POSTURL,(char *) &configURL[0]);
+
+	get_str_json(POSTURL,(char *) &configURL[0]);	
 	get_version(&version[0]);
 	sprintf(pdata,POST_FW_INFO,puid,&version[0]);
-    logging(DBG_EVENT,"%s\n", pdata);
-	sprintf(pURL,FW_INFO_URL,(char *) &configURL[0]));
-    logging(DBG_EVENT,"%s\n", pURL);
+    printf("%s: %s\n", __FUNCTION__, pdata);
+
+	sprintf(pURL,FW_INFO_URL,(char *) &configURL[0]);
+    printf("%s: %s\n", __FUNCTION__, pURL);
 
     /* In windows, this will init the winsock stuff */ 
     curl_global_init(CURL_GLOBAL_ALL);
@@ -110,7 +110,7 @@ int post_fw_info(char *coordinate, int boot, int power)
         /* Check for errors */ 
         if(res != CURLE_OK)
 		{
-            logging(DBG_ERROR,"%s:curl_easy_perform() failed: %s\n",
+            printf("%s:curl_easy_perform() failed: %s\n",
 			__FUNCTION__, curl_easy_strerror(res));
 			curl_easy_cleanup(curl);
 			curl_global_cleanup();
@@ -122,4 +122,23 @@ int post_fw_info(char *coordinate, int boot, int power)
     curl_global_cleanup();
 
     return 1;
+}
+
+int get_version(char *version)
+{
+    char dversion[16];
+    FILE *fd;
+    if(access("/mnt/sysdata/log/version", 0 ) == 0)
+    {
+        fd = fopen("/mnt/sysdata/log/version", "r");
+        if(fd > 0)
+        {
+            fscanf(fd, "fwv=%s",(char *) &dversion[0]);
+            fclose(fd);
+            strncpy(version, (char *) &dversion[0], 16);
+            return 1;
+        }
+    }
+    strcpy(version,"N/A");
+    return -1;
 }

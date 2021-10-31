@@ -25,7 +25,7 @@
 
 #define BV_FAILURE (-1)
 #define BV_SUCCESS (1)
-#define FW_FILE "fw.tar.gz"
+#define FW_FILE "/mnt/sysdata/data/fw.tar.gz"
 
 static int upload_bytes = 0;
 static int FileDownload_ret = BV_FAILURE;
