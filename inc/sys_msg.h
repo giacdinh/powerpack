@@ -50,6 +50,7 @@ typedef enum {
     MSG_BARK,
     MSG_TAG,
 	MSG_REBOOT,
+	MSG_SU_CHECK,
     MSG_INVALID
 } MSG_TYPE_ENUM;
 
@@ -100,6 +101,7 @@ int logging(int level, char *logstr, ...);
 int open_msg(key_t key);
 int get_str_json(int itemID, char *strdata);
 char *unit_ID();
+void CTRL_send_SU_msg(int);
 
 extern char *module_list[];
 extern char *modname[];
