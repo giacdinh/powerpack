@@ -256,6 +256,13 @@ host_ping_trial:
 
 		else	// If run on AC just sleep and wake up after REPORT DELAY timer 
 		{
+			if(boot == 1)	// Send message to SU to check for update and Reset 
+			{
+				boot = 0;
+				logging(1,"Send SU message\n");
+				CTRL_send_SU_msg(MSG_SU_CHECK);
+				sleep(300); // wait 5 mins until sofware upgrade complete
+			}
 			logging(1,"kill HAT pppd session\n");
 			system ("sudo killall pppd");
 
@@ -268,11 +275,6 @@ host_ping_trial:
 			{
 				logging(1,"System periodically reboot\n");
 				system("sudo reboot");
-			}
-			if(boot == 1)	// Send message to SU to check for update and Reset 
-			{
-				boot = 0;
-				CTRL_send_SU_msg(MSG_SU_CHECK);
 			}
 		}
 		logging(DBG_EVENT, "Wakeup to report data\n");

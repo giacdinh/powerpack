@@ -175,25 +175,6 @@ int get_core_temp(char *coretemp)
     return -1;
 }
 
-int get_version(char *version)
-{
-	char dversion[16];
-	FILE *fd;
-	if(access("/mnt/sysdata/log/version", 0 ) == 0)
-	{
-        fd = fopen("/mnt/sysdata/log/version", "r");
-        if(fd > 0)
-        {
-            fscanf(fd, "fwv=%s",(char *) &dversion[0]);
-            fclose(fd);
-            strncpy(version, (char *) &dversion[0], 16);
-            return 1;
-        }
-	}
-	strcpy(version,"N/A");
-	return -1;
-}
-
 int get_config_url(char *url)
 {
 	char posturl[256], endpoint[256];
