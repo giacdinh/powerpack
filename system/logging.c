@@ -29,6 +29,25 @@
 #include "sys_msg.h"
 
 #define LOG_PRINT_LEVEL DBG_EVENT 
+int get_version(char *version)
+{
+    char dversion[16];
+    FILE *fd;
+    if(access("/mnt/sysdata/log/version", 0 ) == 0)
+    {
+        fd = fopen("/mnt/sysdata/log/version", "r");
+        if(fd > 0)
+        {
+            fscanf(fd, "fwv=%s",(char *) &dversion[0]);
+            fclose(fd);
+            strncpy(version, (char *) &dversion[0], 16);
+            return 1;
+        }
+    }
+    strcpy(version,"N/A");
+    return -1;
+}
+
 
 int logging(int level, char *logstr, ...)
 {
