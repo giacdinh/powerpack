@@ -32,33 +32,49 @@
 #define POST_FW_INFO	"uid=%s&fwv=%s"
 #define FW_INFO_URL		"%s/fw_info.php?"
 
-extern int get_version(char *);
+extern int get_su_file(char *);
 
 /* Set test Gobal value. At final release this s */
-static int Cloud_Response(void *ptr, size_t size, size_t nmemb, void *stream)
+static int Post_FW_Response(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-	logging(1,"%s\n", (char *) ptr);
+	logging(DBG_INFO,"%s: %s\n",__FUNCTION__,(char *) ptr);
+	// Cleanup downstream URL before pass on. (Remove \");
+	char cleanURL[64], *pstr;
+	int i, result = -1;
+	pstr = (char *) ptr;
+	for(i=0; i <= strlen((char *) ptr); i++)
+	{
+		cleanURL[i] = *pstr++;
+		if(cleanURL[i] == '\"')
+			i--;
+	}
+	//logging(1,"%s:**  %s\n",__FUNCTION__, (char *) ptr);
+	result = get_su_file((char *) &cleanURL[0]);
+	if(result == 0)
+	{
+		//logging(1,"Extract FW\n");
+		system("extractfw.sh");
+		sleep(2);
+		//logging(1,"Execute Software Upgrade\n");
+		system("/mnt/sysdata/data/pp_fw_install.sh > /home/bacson/up.txt");
+	}
+	else
+		logging(1,"Failed to download file\n");
     return nmemb;
 }
 
-static size_t Cloud_Header_Response(char *buffer, size_t size, size_t nitems, void *userdata)
+static size_t Post_FW_Header_Response(char *buffer, size_t size, size_t nitems, void *userdata)
 {
     if(strstr(buffer, "HTTP"))
     {
 		if(strstr(buffer, "200 OK"))
-			logging(1,"response OK\n");	
-		else
-		{
-			logging(DBG_INFO,"%s\n",buffer);
-			logging(1,"%s\n",buffer);
-			get_su_file(buffer);
-		}
+			logging(DBG_INFO,"%s: response OK\n", __FUNCTION__);	
     }
 
     return nitems;
 }
 
-int post_fw_info(char *coordinate, int boot, int power)
+int post_fw_info()
 {
     CURL *curl;
     CURLcode res;
@@ -82,9 +98,9 @@ int post_fw_info(char *coordinate, int boot, int power)
 	get_str_json(POSTURL,(char *) &configURL[0]);
 	get_version(&version[0]);
 	sprintf(pdata,POST_FW_INFO,puid,&version[0]);
-    logging(DBG_EVENT,"%s\n", pdata);
-	sprintf(pURL,FW_INFO_URL,(char *) &configURL[0]));
-    logging(DBG_EVENT,"%s\n", pURL);
+    //logging(DBG_EVENT,"%s\n", pdata);
+	sprintf(pURL,FW_INFO_URL,(char *) &configURL[0]);
+    //logging(DBG_EVENT,"%s\n", pURL);
 
     /* In windows, this will init the winsock stuff */ 
     curl_global_init(CURL_GLOBAL_ALL);
@@ -92,8 +108,8 @@ int post_fw_info(char *coordinate, int boot, int power)
     /* get a curl handle */ 
     curl = curl_easy_init();
     if(curl) {
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Cloud_Response);
-        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, Cloud_Header_Response);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Post_FW_Response);
+        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, Post_FW_Header_Response);
 		curl_easy_setopt(curl, CURLOPT_URL, pURL);
  
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);

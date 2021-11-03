@@ -32,6 +32,7 @@
 
 void *su_dog_bark_task();
 void su_msg_handler(SU_MSG_T *Incoming);
+int post_fw_info();
 
 void *su_main_task()
 {
@@ -84,6 +85,10 @@ void su_msg_handler(SU_MSG_T *Incoming)
 	
     switch(Incoming->header.subType)
     {
+		case MSG_SU_CHECK:
+			logging(1, "%s: Time to check for Software update\n",__FUNCTION__);
+			post_fw_info();
+		break;
         default:
             logging(DBG_INFO, "%s: Unknown message type %d\n",__FUNCTION__, Incoming->header.subType);
             break;
