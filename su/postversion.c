@@ -31,31 +31,28 @@
 #define CLOUD_ACCEPT	"Accept: application/json"
 #define POST_FW_INFO	"uid=%s&fwv=%s"
 #define FW_INFO_URL		"%s/fw_info.php?"
+#define NO_UPDATE		"No_update"
 
 extern int get_su_file(char *);
 
 /* Set test Gobal value. At final release this s */
 static int Post_FW_Response(void *ptr, size_t size, size_t nmemb, void *stream)
 {
+	int result = -1;
 	logging(DBG_INFO,"%s: %s\n",__FUNCTION__,(char *) ptr);
-	// Cleanup downstream URL before pass on. (Remove \");
-	char cleanURL[64], *pstr;
-	int i, result = -1;
-	pstr = (char *) ptr;
-	for(i=0; i <= strlen((char *) ptr); i++)
+
+	if(0 == strncmp(NO_UPDATE, (char *) ptr, 9))
 	{
-		cleanURL[i] = *pstr++;
-		if(cleanURL[i] == '\"')
-			i--;
+		logging(1,"%s: No update available\n",__FUNCTION__);
+		sleep(2); // Make sure downstream dump is complete
+		return nmemb;
 	}
-	//logging(1,"%s:**  %s\n",__FUNCTION__, (char *) ptr);
-	result = get_su_file((char *) &cleanURL[0]);
+
+	result = get_su_file((char *) ptr);
 	if(result == 0)
 	{
-		//logging(1,"Extract FW\n");
 		system("extractfw.sh");
 		sleep(2);
-		//logging(1,"Execute Software Upgrade\n");
 		system("/mnt/sysdata/data/pp_fw_install.sh > /home/bacson/up.txt");
 	}
 	else
@@ -98,9 +95,7 @@ int post_fw_info()
 	get_str_json(POSTURL,(char *) &configURL[0]);
 	get_version(&version[0]);
 	sprintf(pdata,POST_FW_INFO,puid,&version[0]);
-    //logging(DBG_EVENT,"%s\n", pdata);
 	sprintf(pURL,FW_INFO_URL,(char *) &configURL[0]);
-    //logging(DBG_EVENT,"%s\n", pURL);
 
     /* In windows, this will init the winsock stuff */ 
     curl_global_init(CURL_GLOBAL_ALL);

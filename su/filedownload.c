@@ -41,6 +41,7 @@ extern int endpoint_url;
 static int FileDownload_writecallback(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     size_t written = fwrite(ptr, size, nmemb, stream);
+	logging(DBG_INFO,"%s: total bytes %d\n", __FUNCTION__, written);
     return written;
 }
 static size_t FileDownload_Header_Response(char *buffer, size_t size, size_t nitems, void *userdata)
@@ -62,20 +63,17 @@ int get_su_file(char *url_download)
     CURL *curl;
     CURLcode res;
     FILE *download;
-	char url_buf[128], *pFile_url_download;
 
 	// Clean up if any old software from previous upgrade
 	system("rm -rf /mnt/sysdata/data/*");
 
-	pFile_url_download = (char *) &url_buf[0];
-	sprintf(pFile_url_download,FILE_URL,url_download);
-	//logging(1,"%s: %s\n", __FUNCTION__, pFile_url_download);
+	logging(DBG_INFO,"%s: %s\n", __FUNCTION__, url_download);
     download = fopen(FW_FILE, "wb+");
     /* get a curl handle */ 
     curl = curl_easy_init();
     if(curl) {
 		//curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-		curl_easy_setopt(curl, CURLOPT_URL, pFile_url_download);
+		curl_easy_setopt(curl, CURLOPT_URL, url_download);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, FileDownload_writecallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, download);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);

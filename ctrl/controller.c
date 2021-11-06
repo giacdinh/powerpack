@@ -240,6 +240,9 @@ host_ping_trial:
 			}
 		}		
 
+logging(1,"Send SU message\n");
+CTRL_send_SU_msg(MSG_SU_CHECK);
+sleep(30); // wait 5 mins until sofware upgrade complete
 		if(power == 0) // Run from battery, will flag controller to shutdown power
 		{
 			logging(1,"System run on battery. Let controller shutdown to conserve power\n");
