@@ -31,7 +31,7 @@
 #define CLOUD_ACCEPT	"Accept: application/json"
 #define POST_FW_INFO	"uid=%s&fwv=%s"
 #define FW_INFO_URL		"%s/fw_info.php?"
-#define NO_UPDATE		"No_update"
+#define NO_UPDATE		"No_upgrade"
 
 extern int get_su_file(char *);
 

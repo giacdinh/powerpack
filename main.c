@@ -27,7 +27,7 @@
 #include "build.h"
 #include "common.h"
 
-#define APP_VERSION "1.0.7.UG" 
+#define APP_VERSION "1.0.7" 
 
 extern void *wdog_main_task();
 extern void *remotem_main_task();
