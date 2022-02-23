@@ -64,3 +64,4 @@ int get_version(char *version);
 #define REPORT_DELAY	6		// Do 6 hours each post, 4 times per day	
 #define PERIODIC_REBOOT 48		// Force system reboot every 2 days to keep software in sync
 #define UDP_BC_DEV		"wlan0"
+#define GPS_SCAN_TIME	600

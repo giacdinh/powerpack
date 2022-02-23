@@ -17,7 +17,7 @@
  * from Bac Son Technologies LLC.
  */
 
-int postdata(char *,int ,int ,int );
+int postdata(char *,int ,int ,int ,int );
 char *unit_ID();
 int get_core_temp(char *);
 int get_version(char *);
@@ -31,6 +31,7 @@ int get_gps_info(NMEA_RMC_T *rmc);
 int GPS_EPO_nocoord_flag(int);
 int remove_GPS_EPO_nocoord_flag();
 int GPS_EPO_nocoord_check();
+int get_sim_gps(float *, float *);
 #define BACSON_HOST_NAME "trackingde.tech"
 #define POPHOST1 "google.com"
 #define POPHOST2 "www.yahoo.com"

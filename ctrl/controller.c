@@ -102,7 +102,8 @@ void *ctrl_dog_bark_task()
 void *ctrl_worker_task()
 {
 	static int time_set_init = -1, usb_init = -1, netw_issue = 0;  
-	static int gps_cnt = 0, ping_cnt = 0;
+	static int gps_cnt = 0, ping_cnt = 0, simgps = 0;
+	float lat,lng;
 	NMEA_RMC_T rmc;
 	char coord[128];
 	static int boot=1, power=0;
@@ -123,70 +124,66 @@ void *ctrl_worker_task()
 			logging(1,"Turn on HAT\n");
 			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
 		}
-		else if (hat_pwr_status == 1)
-			logging(DBG_EVENT,"HAT port may be on, don't turn it on\n");
+		else if (hat_pwr_status == 1 && simgps == 1)
+			logging(DBG_EVENT,"HAT port may be on with TRUE GPS, don't reset\n");
+		else if (hat_pwr_status == 1 && simgps == 0)
+		{
+			logging(DBG_EVENT,"Use SIM GPS last time. Reset turn off HAT\n");
+			// If HAT is on and failed TRUE GPS coord. Reset HAT
+			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
+			sleep(5);
+			logging(DBG_EVENT,"Turn HAT back ON\n");
+			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
+			sleep(15);
+		}
 		else
 			logging(DBG_ERROR,"May be something wrong with HAT\n");
 		
 		// Wait for 30 second for it to be ready to use
 		sleep(5);
+		
+		if(-1 == get_sim_gps(&lat, &lng))
+		{
+			lat = 0.000001;
+			lng = 0.000001;
+		}
+		else
+		{
+			logging(1,"SIM lat: %f long: %f\n", lat, lng);
+			if(lat == 0 && lng == 0)
+			{
+				lat = 0.000001;
+				lng = 0.000001;
+			}
+		}
 
 		init_raspi_hat_gps();
 
 		// Clean up coordinate structure holder before each use
 		bzero((void *) &rmc, sizeof(NMEA_RMC_T));
 
-		//try to get time from gps and set system time
-		gps_cnt++;
-		if(gps_cnt > 5)
-		{
-			rmc.rlat = 0.000001;
-			rmc.rlong = 0.000001;
-			gps_cnt = 0;
-			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
-			goto use_default_gps;
-		}
 		gpsstart = get_uptime();	
 		gps_ret = get_gps_info(&rmc);
-		if(gps_ret == GPS_NO_PORT)
+		if(gps_ret == GPS_NO_PORT || gps_ret == GPS_NO_DEV || gps_ret == GPS_NO_SAT)
 		{
-			logging(DBG_ERROR,"%s: Error return, can't get GPS\n", __FUNCTION__);
-			sleep(5);
-			continue;
-		}
-		else if(gps_ret == GPS_NO_DEV)
-		{
-			if(gps_cnt > 2) // try to get GPS device mount point couple time
-			{
-				logging(DBG_ERROR,"Force system reboot since no GPS device mount point\n");
-				system("reboot");
-			}
-			sleep(5);
-			continue;
-		}
-		else if(gps_ret == GPS_NO_SAT) // use default coordinate if no valid one available
-		{
-			rmc.rlat = 0.000001;
-			rmc.rlong = 0.000001;
-			gps_cnt = 0;
-			logging(DBG_ERROR,"%s: Can't get GPS use default coordinate\n", __FUNCTION__);
-			goto use_default_gps;
+			logging(DBG_ERROR,"%s: Can't get GPS erno: %d\n", __FUNCTION__, gps_ret);
+			rmc.rlat = lat;
+			rmc.rlong = lng;
+			simgps = 0;
 		}
 		else
 		{
 			if(-1 == coord_validate(&rmc))
 			{
-				logging(DBG_ERROR, "Coordinate invalid. Sleep for a minute. GPScnt: %d\n", gps_cnt);
-				sleep(30);
-				continue;
+				logging(DBG_ERROR, "Coordinate invalid load with SIM GPS\n");
+				rmc.rlat = lat;
+				rmc.rlong = lng;
+				simgps = 0;
 			}
 			else
-			{
-				gps_cnt = 0;    // Reset when able to get GPS coordinate
-			}
+				simgps = 1;
 		}
 
-use_default_gps:
 		gpsend = get_uptime();	
 		logging(1, "GPS start: %lu end: %lu total: %lu\n", gpsstart, gpsend, (gpsend-gpsstart));
 		// get core temperature 
@@ -203,7 +200,6 @@ use_default_gps:
 		logging(DBG_EVENT,"Done cellular connection\n");
 
 host_ping_trial:	
-		//if(-1 == ping_host() && ping_cnt++ < 10)
 		if(-1 == ping_host())
 		{
 			if(ping_cnt++ > PING_TIME)
@@ -231,12 +227,12 @@ host_ping_trial:
 			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
 			logging(DBG_CTRL, "coordinate: %s\n", (char *) &coord[0]);
 			int postresult = 0;
-			postresult = postdata((char *) &coord[0], boot, power,(gpsend-gpsstart));
+			postresult = postdata((char *) &coord[0], boot, power,(gpsend-gpsstart), simgps);
 			if(postresult == -1)
 			{
 				sleep(30);
 				logging(1, "Try to post one more time before give up\n");
-				postresult = postdata((char *) &coord[0], boot, power, (gpsend-gpsstart));
+				postresult = postdata((char *) &coord[0], boot, power, (gpsend-gpsstart), simgps);
 			}
 		}		
 
@@ -251,9 +247,8 @@ host_ping_trial:
 			system ("sudo killall pppd");
 			logging(DBG_ERROR,"Thing shouldn't be getting here\n");
 			// If it getting here just do normal report
-			sleep(REPORT_DELAY*60*60); // Hang there because of control board will shutdown
+			sleep(REPORT_DELAY*60*60);		// Sleep for 6 hours
 		}
-
 		else	// If run on AC just sleep and wake up after REPORT DELAY timer 
 		{
 			if(boot == 1)	// Send message to SU to check for update and Reset 
@@ -267,7 +262,7 @@ host_ping_trial:
 			system ("sudo killall pppd");
 
 			logging(DBG_EVENT, "Sleep %d hours after data report done\n", REPORT_DELAY);
-			sleep(REPORT_DELAY*60*60);		// Sleep for 4 hours
+			sleep(REPORT_DELAY*60*60);		// Sleep for 6 hours
 			device_reboot++;	
 			// If system run for more than 48h, then reboot device
 			// This make sure the system at healthy state all the time
