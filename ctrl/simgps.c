@@ -89,6 +89,7 @@ logging(1,"Entering: %s\n", __FUNCTION__);
 				logging(DBG_ERROR,"Can't scan SIM GPS coordinate\n");	
 				*lat = 0;
 				*lng = 0;
+				close(fd);
 				return -1;
 			}
 			else
