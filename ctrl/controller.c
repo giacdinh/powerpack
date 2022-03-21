@@ -126,35 +126,29 @@ void *ctrl_worker_task()
 		}
 		else if (hat_pwr_status == 1 && simgps == 1)
 			logging(DBG_EVENT,"HAT port may be on with TRUE GPS, don't reset\n");
-		else if (hat_pwr_status == 1 && simgps == 0)
-		{
-			logging(DBG_EVENT,"Use SIM GPS last time. Reset turn off HAT\n");
-			// If HAT is on and failed TRUE GPS coord. Reset HAT
-			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
-			sleep(5);
-			logging(DBG_EVENT,"Turn HAT back ON\n");
-			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
-			sleep(15);
-		}
-		else
-			logging(DBG_ERROR,"May be something wrong with HAT\n");
+		else if (boot == 0)
+			logging(DBG_ERROR,"May be something wrong with HAT or NO GPS signal\n");
 		
 		// Wait for 30 second for it to be ready to use
 		sleep(5);
 		
 		if(-1 == get_sim_gps(&lat, &lng))
-		{
+		{	
 			lat = 0.000001;
 			lng = 0.000001;
+			simgps = 0;
 		}
 		else
 		{
 			logging(1,"SIM lat: %f long: %f\n", lat, lng);
-			if(lat == 0 && lng == 0)
+			if(lat == 0 || lng == 0)
 			{
 				lat = 0.000001;
 				lng = 0.000001;
+				simgps = 0;
 			}
+			else
+				simgps = 2; // Get GPS from SIM
 		}
 
 		init_raspi_hat_gps();
@@ -166,10 +160,10 @@ void *ctrl_worker_task()
 		gps_ret = get_gps_info(&rmc);
 		if(gps_ret == GPS_NO_PORT || gps_ret == GPS_NO_DEV || gps_ret == GPS_NO_SAT)
 		{
+			// GPS coordinate retrieve from Hologram server
 			logging(DBG_ERROR,"%s: Can't get GPS erno: %d\n", __FUNCTION__, gps_ret);
 			rmc.rlat = lat;
 			rmc.rlong = lng;
-			simgps = 0;
 		}
 		else
 		{
@@ -178,7 +172,6 @@ void *ctrl_worker_task()
 				logging(DBG_ERROR, "Coordinate invalid load with SIM GPS\n");
 				rmc.rlat = lat;
 				rmc.rlong = lng;
-				simgps = 0;
 			}
 			else
 				simgps = 1;
@@ -221,6 +214,7 @@ host_ping_trial:
 		}
 		else
 		{
+			// simgps=0 GPS=Hologram, simgps=1 GPS=true, simgps=2 GPS=SIM
 			netw_issue = 0; // reset network issue flag
 			// Ready to post, check power source status
 			bzero((void *) &coord[0], 128);
