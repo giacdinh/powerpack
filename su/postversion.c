@@ -51,7 +51,7 @@ static int Post_FW_Response(void *ptr, size_t size, size_t nmemb, void *stream)
 	result = get_su_file((char *) ptr);
 	if(result == 0)
 	{
-		system("extractfw.sh");
+		system("cd /mnt/sysdata/data; tar zxf fw.tar.gz");
 		sleep(2);
 		system("/mnt/sysdata/data/pp_fw_install.sh > /home/bacson/up.txt");
 	}
