@@ -1,12 +1,18 @@
 
-CFLAGS=-I../inc #-DUNIT_DEBUG=1
+CFLAGS= -I../inc #-DUNIT_DEBUG=1
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-OBJS=controller.o ppgps.o cloudpost.o get_json_data.o gpio.o agps.o gps_nocoord.o simgps.o
+OBJS=controller.o cloudpost.o get_json_data.o gpio.o sim7x00.o arduPi.o GPS.o
+
+%.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+%.o: %.cpp
+	g++ -c -o $@ $< $(CFLAGS)
 
 controller.a: $(OBJS)
-	ar rc ctrl.a *.o
+	ar -cvq ctrl.a *.o
 
 clean:
 	 rm *.o *.a

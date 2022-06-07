@@ -101,82 +101,19 @@ void *ctrl_dog_bark_task()
 
 void *ctrl_worker_task()
 {
-	static int time_set_init = -1, usb_init = -1, netw_issue = 0;  
-	static int gps_cnt = 0, ping_cnt = 0, simgps = 0;
+	static int time_set_init = -1, usb_init = -1, netw_issue = 0, device_reboot = 0;  
+	int simgps = 0, gpsstart, gpsend, ping_cnt, result;
 	float lat,lng;
-	NMEA_RMC_T rmc;
 	char coord[128];
 	static int boot=1, power=0;
-	static int device_reboot = 0;
 	int hat_pwr_status = -1, gps_ret = -1;
-	unsigned long gpsstart, gpsend;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
 
     while(1) 
 	{
-		//logging(1,"Device with GSM/GPS HAT is %d %s\n",hat_pwr_status, hat_pwr_status==0?"OFF":"ON");
-		// HAT power need to be checked every time before turn ON/OFF
-		hat_pwr_status = test_hat_power();
 		power = get_power_source();
-
-		if(hat_pwr_status == 0)
-		{
-			logging(1,"Turn on HAT\n");
-			system("sudo python /usr/local/bin/GSM_PWRKEY.py");
-		}
-		else if (hat_pwr_status == 1 && simgps == 1)
-			logging(DBG_EVENT,"HAT port may be on with TRUE GPS, don't reset\n");
-		else if (boot == 0)
-			logging(DBG_ERROR,"May be something wrong with HAT or NO GPS signal\n");
-		
-		// Wait for 30 second for it to be ready to use
-		sleep(5);
-		
-		if(-1 == get_sim_gps(&lat, &lng))
-		{	
-			lat = 0.000001;
-			lng = 0.000001;
-			simgps = 0;
-		}
-		else
-		{
-			logging(1,"SIM lat: %f long: %f\n", lat, lng);
-			if(lat == 0 || lng == 0)
-			{
-				lat = 0.000001;
-				lng = 0.000001;
-				simgps = 0;
-			}
-			else
-				simgps = 2; // Get GPS from SIM
-		}
-
-		init_raspi_hat_gps();
-
-		// Clean up coordinate structure holder before each use
-		bzero((void *) &rmc, sizeof(NMEA_RMC_T));
-
 		gpsstart = get_uptime();	
-		gps_ret = get_gps_info(&rmc);
-		if(gps_ret == GPS_NO_PORT || gps_ret == GPS_NO_DEV || gps_ret == GPS_NO_SAT)
-		{
-			// GPS coordinate retrieve from Hologram server
-			logging(DBG_ERROR,"%s: Can't get GPS erno: %d\n", __FUNCTION__, gps_ret);
-			rmc.rlat = lat;
-			rmc.rlong = lng;
-		}
-		else
-		{
-			if(-1 == coord_validate(&rmc))
-			{
-				logging(DBG_ERROR, "Coordinate invalid load with SIM GPS\n");
-				rmc.rlat = lat;
-				rmc.rlong = lng;
-			}
-			else
-				simgps = 1;
-		}
-
+		simgps = get_gps_info(&lat, &lng);
 		gpsend = get_uptime();	
 		logging(1, "GPS start: %lu end: %lu total: %lu\n", gpsstart, gpsend, (gpsend-gpsstart));
 		// get core temperature 
@@ -218,7 +155,7 @@ host_ping_trial:
 			netw_issue = 0; // reset network issue flag
 			// Ready to post, check power source status
 			bzero((void *) &coord[0], 128);
-			sprintf((char *) &coord[0],"%f, %f", rmc.rlat, rmc.rlong);
+			sprintf((char *) &coord[0],"%f, %f", lat, lng);
 			logging(DBG_CTRL, "coordinate: %s\n", (char *) &coord[0]);
 			int postresult = 0;
 			postresult = postdata((char *) &coord[0], boot, power,(gpsend-gpsstart), simgps);
