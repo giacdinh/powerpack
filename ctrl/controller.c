@@ -114,6 +114,11 @@ void *ctrl_worker_task()
 		power = get_power_source();
 		gpsstart = get_uptime();	
 		simgps = get_gps_info(&lat, &lng);
+		if(simgps == -1)
+		{
+			lat = 0.000001;
+			lng = 0.000001;
+		}
 		gpsend = get_uptime();	
 		logging(1, "GPS start: %lu end: %lu total: %lu\n", gpsstart, gpsend, (gpsend-gpsstart));
 		// get core temperature 

@@ -38,7 +38,5 @@ extern "C" int get_gps_info(float *lat, float *lng)
 	int result;
 	sim7600.PowerOn(POWERKEY);
 	sim7600.GPSPositioning(lat, lng, &result);
-	printf(" Lat: %f\n", lat);
-	printf(" Lng: %f\n", lng);
 	return result;
 }
