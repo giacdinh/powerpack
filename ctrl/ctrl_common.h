@@ -27,7 +27,7 @@ int set_gpio_pin16_reset();
 int check_gps_epo_load_date();
 int set_serial(int fd, int speed);
 int set_gps_epo();
-//int get_gps_info(float *, float *);
+int get_gps_info(float *lat, float *lng);
 int GPS_EPO_nocoord_flag(int);
 int remove_GPS_EPO_nocoord_flag();
 int GPS_EPO_nocoord_check();

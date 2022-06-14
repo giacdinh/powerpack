@@ -101,12 +101,12 @@ void *ctrl_dog_bark_task()
 
 void *ctrl_worker_task()
 {
-	static int time_set_init = -1, usb_init = -1, netw_issue = 0, device_reboot = 0;  
-	int simgps = 0, gpsstart, gpsend, ping_cnt, result;
+	static int time_set_init = -1, usb_init = -1, device_reboot = 0;  
+	int simgps = 0, gpsstart, gpsend, result;
 	float lat,lng;
 	char coord[128];
 	static int boot=1, power=0;
-	int hat_pwr_status = -1, gps_ret = -1;
+	int postresult, gps_ret = -1;
 	logging(DBG_INFO,"%s: Entering ...\n", __FUNCTION__);
 
     while(1) 
@@ -130,47 +130,29 @@ void *ctrl_worker_task()
 		logging(DBG_CTRL, "Setup PPP. Network routing should be handled by PPP\n");
 		logging(DBG_CTRL,"Use Hologram cellular connection\n");
 		system("sudo pppd call gprs-hologram &");
-		sleep(20);
+		sleep(15);
+		// Add default route/gateway to device to send out by cellular
+		system("sudo route add -net 0.0.0.0 ppp0");
+		sleep(5);
 		system("sudo echo `ifconfig ppp0 |grep inet` >> /mnt/sysdata/log/`date -I |awk -F '-' '{print $1$2$3}'`'_log'");
 		logging(DBG_EVENT,"Done cellular connection\n");
 
-host_ping_trial:	
 		if(-1 == ping_host())
+			logging(DBG_ERROR,"Ping failed. Can't connect to host.\n");	
+		
+		// simgps=0 GPS=Hologram, simgps=1 GPS=true, simgps=2 GPS=SIM
+		// Ready to post, check power source status
+		bzero((void *) &coord[0], 128);
+		sprintf((char *) &coord[0],"%f, %f", lat, lng);
+		logging(DBG_CTRL, "coordinate: %s\n", (char *) &coord[0]);
+		int postresult = 0;
+		postresult = postdata((char *) &coord[0], boot, power,(gpsend-gpsstart), simgps);
+		if(postresult == -1)
 		{
-			if(ping_cnt++ > PING_TIME)
-			{
-				ping_cnt = 0; 
-				logging(DBG_ERROR,"Can't connect to host. Skip this post\n");	
-				netw_issue++;
-				if(netw_issue > 2) // If device have 3 skip post reboot
-					system("reboot");
-				else
-					netw_issue++;
-			}
-			else
-			{
-				sleep(2);
-				logging(DBG_EVENT, "Trying to ping host\n");
-				goto host_ping_trial;
-			}
+			sleep(30);
+			logging(1, "Try to post one more time before give up\n");
+			postresult = postdata((char *) &coord[0], boot, power, (gpsend-gpsstart), simgps);
 		}
-		else
-		{
-			// simgps=0 GPS=Hologram, simgps=1 GPS=true, simgps=2 GPS=SIM
-			netw_issue = 0; // reset network issue flag
-			// Ready to post, check power source status
-			bzero((void *) &coord[0], 128);
-			sprintf((char *) &coord[0],"%f, %f", lat, lng);
-			logging(DBG_CTRL, "coordinate: %s\n", (char *) &coord[0]);
-			int postresult = 0;
-			postresult = postdata((char *) &coord[0], boot, power,(gpsend-gpsstart), simgps);
-			if(postresult == -1)
-			{
-				sleep(30);
-				logging(1, "Try to post one more time before give up\n");
-				postresult = postdata((char *) &coord[0], boot, power, (gpsend-gpsstart), simgps);
-			}
-		}		
 
 		if(power == 0) // Run from battery, will flag controller to shutdown power
 		{
