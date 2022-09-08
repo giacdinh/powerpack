@@ -32,7 +32,7 @@ int GPS_EPO_nocoord_flag(int);
 int remove_GPS_EPO_nocoord_flag();
 int GPS_EPO_nocoord_check();
 int get_sim_gps(float *, float *);
-#define BACSON_HOST_NAME "trackingde.tech"
+#define BACSON_HOST_NAME "www.dlj2020.tech"
 #define POPHOST1 "google.com"
 #define POPHOST2 "www.yahoo.com"
 #define PING_TIME	(2)
