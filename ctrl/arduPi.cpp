@@ -21,6 +21,7 @@
 
 
 #include "arduPi.h"
+#include "ctrl_common.h"
 
 struct bcm2835_peripheral gpio = {GPIO_BASE2};
 struct bcm2835_peripheral bsc_rev1 = {IOBASE + 0X205000};
@@ -60,7 +61,7 @@ timeval start_program, end_point;
 //Constructor
 SerialPi::SerialPi(){
 	REV = getBoardRev();
-	serialPort="/dev/ttyS0";
+	serialPort=GPS_SERIAL_DEV;
 //	serialPort = "/dev/ttyAMA0";
     timeOut = 1000;
 }
