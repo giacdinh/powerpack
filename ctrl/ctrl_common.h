@@ -36,5 +36,5 @@ int get_sim_gps(float *, float *);
 #define POPHOST1 "google.com"
 #define POPHOST2 "www.yahoo.com"
 #define PING_TIME	(2)
-#define GPS_SERIAL_DEV "/dev/ttyUSB2" //For 7600G(B) this is serial port, for 7600A ttyS0
+#define GPS_SERIAL_DEV "/dev/ttyS0" //For 7600G(B) this is serial port ttyUSB0
 #define EPO_FLAG_FILE "/home/bacson/EPO_FLAG"
