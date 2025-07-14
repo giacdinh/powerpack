@@ -36,7 +36,11 @@
 
 SSL_CTX		*sm_global_ctx=NULL;
 #define MAX_CERT_SIZE 2048
+#ifdef DLJ2020				//Define ID string length for DLJ2020 at 8 other reduced to 6
 #define DEVICE_ID_STRLEN 8 
+#else
+#define DEVICE_ID_STRLEN 6 
+#endif
 
 /* Default HW cryptodevice for the Flash project is the OCF cryptodev */
 #define FLASH25_SM_HW_ENGINE	"cryptodev"
