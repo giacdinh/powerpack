@@ -127,16 +127,18 @@ int postdata(char *coordinate, int boot, int power,int time,int simgps)
         /* Check for errors */ 
         if(res != CURLE_OK)
 		{
-            logging(DBG_ERROR,"%s:curl_easy_perform() failed: %s\n",
+            logging(DBG_ERROR,"%s:curl_easy_perform() failed, try default site: %s\n",
 			__FUNCTION__, curl_easy_strerror(res));
         
 			curl_easy_setopt(curl, CURLOPT_URL, DEFAULT_URL);
+			res = curl_easy_perform(curl);
 			if(res != CURLE_OK)
 			{
-				logging(DBG_ERROR,"%s: Repost use DEFAULT_URL curl_easy_perform() failed: %s\n",
+				logging(DBG_ERROR,"%s: Repost use DEFAULT_URL curl_easy_perform() failed, try backup: %s\n",
 					__FUNCTION__, curl_easy_strerror(res));
 
 				curl_easy_setopt(curl, CURLOPT_URL, BACKUP_URL);
+				res = curl_easy_perform(curl);
 				if(res != CURLE_OK)
 				{
 					logging(DBG_ERROR,"%s: Repost use BACKUP_URL curl_easy_perform() failed: %s\n",
