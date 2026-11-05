@@ -27,13 +27,18 @@
 #include "build.h"
 #include "common.h"
 
-#define APP_VERSION "2.0.3" 
+#define APP_VERSION "2.0.4" 
 
 extern void *wdog_main_task();
 extern void *remotem_main_task();
 extern void *ctrl_main_task();
 extern void *conf_main_task();
 extern void *su_main_task();
+
+int get_version(char *version)
+{
+    strcpy(version,APP_VERSION);
+}
 
 int main(int argc, char **argv)
 {

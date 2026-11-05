@@ -39,6 +39,7 @@ extern int get_su_file(char *);
 static int Post_FW_Response(void *ptr, size_t size, size_t nmemb, void *stream)
 {
 	int result = -1;
+	char url_buf[100] = "\0";
 	logging(DBG_INFO,"%s: %s\n",__FUNCTION__,(char *) ptr);
 
 	if(0 == strncmp(NO_UPDATE, (char *) ptr, 9))
@@ -48,7 +49,8 @@ static int Post_FW_Response(void *ptr, size_t size, size_t nmemb, void *stream)
 		return nmemb;
 	}
 
-	result = get_su_file((char *) ptr);
+    memcpy((void *) &url_buf[0], (char *) ptr, nmemb);
+    result = get_su_file((char *) &url_buf[0]);
 	if(result == 0)
 	{
 		system("cd /mnt/sysdata/data; tar zxf fw.tar.gz");
